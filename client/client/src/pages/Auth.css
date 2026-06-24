@@ -1,0 +1,239 @@
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0a0f1e;
+}
+
+.auth-container {
+  position: relative;
+  width: 850px;
+  height: 520px;
+  background: #0d1526;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 0.5px solid #1e3a5f;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+.form-box {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem;
+  transition: all 0.7s ease;
+  top: 0;
+  z-index: 1;
+}
+
+.form-box.login {
+  left: 0;
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+}
+
+.form-box.register {
+  right: 0;
+  left: auto;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateX(100%);
+}
+
+.auth-container.active .form-box.login {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateX(-100%);
+}
+
+.auth-container.active .form-box.register {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+}
+
+.form-box h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #4da6ff;
+  margin-bottom: 0.4rem;
+}
+
+.auth-subtitle {
+  color: #4a6a8a;
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+.auth-error {
+  background: #ff475722;
+  border: 1px solid #ff4757;
+  color: #ff4757;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  font-size: 0.82rem;
+}
+
+.form-group {
+  margin-bottom: 0.9rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #7a9abf;
+  font-size: 0.82rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: #080d1a;
+  border: 0.5px solid #1e3a5f;
+  border-radius: 8px;
+  color: #c8dff5;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border 0.2s;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.form-group input:focus {
+  border-color: #4da6ff;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 0.72rem;
+  font-size: 0.92rem;
+  margin-top: 0.4rem;
+  border-radius: 8px;
+  background: #1565c0;
+  color: #e3f2fd;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-btn:hover { background: #1976d2; }
+.auth-btn:disabled { background: #0d3a6e; color: #4a6a8a; cursor: not-allowed; }
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1rem;
+  color: #4a6a8a;
+  font-size: 0.82rem;
+}
+
+.auth-switch span {
+  color: #4da6ff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-switch span:hover { text-decoration: underline; }
+
+.toggle-box {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: all 0.7s ease;
+  z-index: 2;
+}
+
+.auth-container.active .toggle-box {
+  left: 0;
+}
+
+.toggle-panel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  transition: all 0.7s ease;
+  background: linear-gradient(135deg, #0d2a4a, #1565c0);
+}
+
+.toggle-panel.toggle-left {
+  left: -100%;
+}
+
+.toggle-panel.toggle-right {
+  left: 0;
+}
+
+.auth-container.active .toggle-panel.toggle-left {
+  left: 0;
+}
+
+.auth-container.active .toggle-panel.toggle-right {
+  left: 100%;
+}
+
+.brand-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.toggle-panel h1 {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #e3f2fd;
+  margin-bottom: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.toggle-panel p {
+  color: #90caf9;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.toggle-btn {
+  padding: 0.6rem 2rem;
+  background: transparent;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.toggle-btn:hover {
+  background: #ffffff;
+  color: #1565c0;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    width: 95%;
+    height: auto;
+    min-height: 500px;
+  }
+  .form-box {
+    width: 100%;
+    position: relative;
+  }
+  .toggle-box { display: none; }
+}
