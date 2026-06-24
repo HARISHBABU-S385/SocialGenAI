@@ -2,8 +2,7 @@ import axios from 'axios';
 
 const API = axios.create({ 
   // Update this line to use your Ngrok backend URL
-  baseURL: 'https://upbeat-rectify-frosty.ngrok-free.dev/api' 
-});
+baseURL: 'https://socialgenai-backend.onrender.com/api'});
 
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem('token');
