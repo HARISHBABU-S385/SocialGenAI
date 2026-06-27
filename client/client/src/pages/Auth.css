@@ -344,3 +344,26 @@
 .forgot-box h3 { color: #4da6ff; margin-bottom: 1.5rem; font-weight: 500; }
 .forgot-msg { color: #4da6ff; font-size: 0.85rem; margin-bottom: 0.5rem; text-align: center; }
 
+.floating-emojis {
+  position: fixed;
+  width: 100%; height: 100%;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.float-emoji {
+  position: absolute;
+  left: var(--x);
+  bottom: -50px;
+  font-size: var(--size);
+  opacity: 0.15;
+  animation: floatEmoji 14s var(--delay) ease-in-out infinite;
+}
+
+@keyframes floatEmoji {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.15; }
+  90% { opacity: 0.15; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}

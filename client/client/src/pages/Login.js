@@ -67,6 +67,15 @@ const Login = () => {
 
   return (
     <div className="auth-wrapper">
+      <div className="floating-emojis">
+  {['❤️','👍','😊','😂','🤣','😍','😒','👌','😘','💕','😁','🙌','😉','😎','🎶','😢','🤷‍♂️','🫡','😶‍🌫️','😴','😫','🥱','😜','🤤','🥵','🥶','😠','🤬','🤕','🧐','👿','😿','🐺','🦍','🫎','🐼'].map((emoji, i) => (
+    <span key={i} className="float-emoji" style={{
+      '--delay': `${i * 1.1}s`,
+      '--x': `${5 + i * 8}%`,
+      '--size': `${1.2 + (i % 3) * 0.4}rem`
+    }}>{emoji}</span>
+  ))}
+</div>
 
       {showForgot && (
         <div className="forgot-overlay">
