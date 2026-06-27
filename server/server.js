@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: ['https://social-gen-ai.vercel.app', 'https://social-gen-ai-neon.vercel.app', 'http://localhost:3000', 'http://localhost:3001']
+  origin: ['https://social-gen-ai.vercel.app', 'https://social-gen-ai-neon.vercel.app', 'https://social-gen-i36qgx42g-harish385.vercel.app', 'http://localhost:3000', 'http://localhost:3001']
 }));
 app.use(express.json());
 
