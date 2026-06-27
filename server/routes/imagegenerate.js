@@ -3,6 +3,17 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const Post = require('../models/Post');
 
+router.post('/', auth, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    const encodedPrompt = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+    res.json({ image: imageUrl });
+  } catch (err) {
+    res.status(500).json({ message: 'Generation failed' });
+  }
+});
+
 router.post('/save', auth, async (req, res) => {
   try {
     const { imageUrl, prompt } = req.body;
