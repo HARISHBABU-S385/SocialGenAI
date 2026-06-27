@@ -67,6 +67,7 @@ const Login = () => {
 
   return (
     <div className="auth-wrapper">
+
       {showForgot && (
         <div className="forgot-overlay">
           <div className="forgot-box">
@@ -86,13 +87,17 @@ const Login = () => {
               <button type="submit" className="auth-btn">Update Password</button>
               <button type="button" className="auth-btn"
                 style={{ background: 'transparent', border: '1px solid rgba(77,166,255,0.2)', marginTop: '0.5rem' }}
-                onClick={() => setShowForgot(false)}>Cancel</button>
+                onClick={() => { setShowForgot(false); setForgotMsg(''); }}>
+                Cancel
+              </button>
             </form>
           </div>
         </div>
       )}
 
       <div className={`auth-container ${isActive ? 'active' : ''}`}>
+
+        {/* LOGIN FORM */}
         <div className="form-box login">
           <h2>Login</h2>
           <p className="auth-subtitle">Welcome back to SocialGenAI</p>
@@ -119,6 +124,7 @@ const Login = () => {
           </p>
         </div>
 
+        {/* REGISTER FORM */}
         <div className="form-box register">
           <h2>Create Account</h2>
           <p className="auth-subtitle">Start generating content for free</p>
@@ -149,20 +155,22 @@ const Login = () => {
           </p>
         </div>
 
+        {/* TOGGLE PANELS */}
         <div className="toggle-box">
           <div className="toggle-panel toggle-left">
             <div className="brand-logo">⚡ SocialGenAI</div>
             <h1>Welcome Back!</h1>
             <p>AI-powered content for every platform</p>
-            <button className="toggle-btn" onClick={() => setIsActive(true)}>Register</button>
+            <button className="toggle-btn" onClick={() => setIsActive(false)}>Login</button>
           </div>
           <div className="toggle-panel toggle-right">
             <div className="brand-logo">⚡ SocialGenAI</div>
             <h1>Join SocialGenAI</h1>
             <p>Create stunning content with AI in seconds</p>
-            <button className="toggle-btn" onClick={() => setIsActive(false)}>Login</button>
+            <button className="toggle-btn" onClick={() => setIsActive(true)}>Register</button>
           </div>
         </div>
+
       </div>
     </div>
   );
