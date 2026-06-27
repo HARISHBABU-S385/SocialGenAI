@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { login, register } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
+import PageTransition from '../components/PageTransition';
 
 const Auth = () => {
   const [isActive, setIsActive] = useState(false);
@@ -51,6 +52,7 @@ const Auth = () => {
   };
 
   return (
+     <PageTransition>
     <div className="auth-wrapper">
       <div className={`auth-container ${isActive ? 'active' : ''}`}>
 
@@ -160,7 +162,9 @@ const Auth = () => {
 
       </div>
     </div>
+     </PageTransition>
   );
 };
+
 
 export default Auth;

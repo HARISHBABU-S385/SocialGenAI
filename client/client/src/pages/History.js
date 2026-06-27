@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getPosts, deletePost } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './History.css';
+import PageTransition from '../components/PageTransition';
 
 const History = () => {
   const { user, logout } = useAuth();
@@ -33,6 +34,8 @@ const History = () => {
   const filtered = filter === 'saved' ? posts.filter(p => p.isSaved) : posts;
 
   return (
+    
+    <PageTransition>
     <div className="history-page">
       <nav className="navbar">
         <span className="navbar-brand">⚡ SocialGenAI</span>
@@ -156,6 +159,7 @@ const History = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

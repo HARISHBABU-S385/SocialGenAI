@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './PlatformSelect.css';
+import PageTransition from '../components/PageTransition';
 
 const platforms = [
   {
@@ -56,6 +57,7 @@ const PlatformSelect = () => {
   const [hoveredId, setHoveredId] = useState(null);
 
   return (
+     <PageTransition>
     <div className="platform-page">
       <nav className="ps-navbar">
         <span className="ps-brand">⚡ SocialGenAI</span>
@@ -154,6 +156,7 @@ const PlatformSelect = () => {
         </div>
       </div>
     </div>
+     </PageTransition>
   );
 };
 

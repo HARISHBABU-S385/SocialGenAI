@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { generateImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './ImageGenerate.css';
+import PageTransition from '../components/PageTransition';
 
 const ImageGenerate = () => {
   const { user, logout } = useAuth();
@@ -29,11 +30,12 @@ const ImageGenerate = () => {
   };
 
   return (
-    <div className="imagegen-page">
-      <nav className="navbar">
-        <span className="navbar-brand">⚡ SocialGenAI</span>
-        <div className="navbar-links">
-          <span className="navbar-user">Hi, {user?.name}</span>
+    <PageTransition>
+      <div className="imagegen-page">
+        <nav className="navbar">
+          <span className="navbar-brand">⚡ SocialGenAI</span>
+          <div className="navbar-links">
+            <span className="navbar-user">Hi, {user?.name}</span>
           <button className="nav-link" onClick={() => navigate('/')}>Platforms</button>
           <button className="nav-link" onClick={() => navigate('/history')}>History</button>
           <button className="btn-outline" onClick={logout}>Logout</button>
@@ -111,6 +113,7 @@ const ImageGenerate = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

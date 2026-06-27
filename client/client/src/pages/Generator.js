@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { generatePost, generateFromImage, savePost, generateImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Generator.css';
+import PageTransition from '../components/PageTransition';
 
 const Generator = () => {
   const { user, logout } = useAuth();
@@ -100,6 +101,7 @@ const Generator = () => {
   ];
 
   return (
+    <PageTransition>
     <div className="generator-page">
       <nav className="navbar">
         <span className="navbar-brand">⚡ SocialGenAI</span>
@@ -359,6 +361,7 @@ const Generator = () => {
         </div>
       </div>
     </div>
+     </PageTransition>
   );
 };
 
