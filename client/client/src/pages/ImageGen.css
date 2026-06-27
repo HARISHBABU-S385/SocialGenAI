@@ -105,3 +105,15 @@
 .ig-regen-btn:hover { background: rgba(77,166,255,0.2); }
 
 @media (max-width: 768px) { .ig-layout { grid-template-columns: 1fr; } }
+
+.ig-upload-area {
+  border: 1px dashed rgba(77,166,255,0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  color: #4a6a8a;
+  font-size: 0.85rem;
+  transition: border 0.3s;
+}
+.ig-upload-area:hover { border-color: rgba(77,166,255,0.4); }

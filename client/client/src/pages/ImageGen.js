@@ -7,10 +7,17 @@ import './ImageGen.css';
 const ImageGen = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [refPreview, setRefPreview] = useState(null);
+  
+  // Existing state
   const [prompt, setPrompt] = useState('');
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // NEW: State for the reference image upload
+  const [refPreview, setRefPreview] = useState(null);
+  const [refFile, setRefFile] = useState(null);
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -18,6 +25,7 @@ const ImageGen = () => {
     setError('');
     setImage(null);
     try {
+      // Note: If your backend needs the image, you'll want to send refFile as FormData here later
       const res = await generateImage({ prompt });
       setImage(res.data.image);
     } catch (err) {
@@ -58,6 +66,39 @@ const ImageGen = () => {
                   required
                 />
               </div>
+
+              {/* === NEW IMAGE UPLOAD SNIPPET ADDED HERE === */}
+              <div className="ig-form-group">
+                <label>Or upload an image to recreate</label>
+                <div 
+                  className="ig-upload-area" 
+                  onClick={() => document.getElementById('refImg').click()}
+                  style={{ cursor: 'pointer', border: '2px dashed #ccc', padding: '20px', textAlign: 'center', borderRadius: '8px' }} // Added some inline styles to make it look clickable, remove if you have CSS for .ig-upload-area
+                >
+                  {refPreview ? (
+                    <img src={refPreview} alt="ref" style={{maxHeight:'120px', borderRadius:'8px'}} />
+                  ) : (
+                    <div>
+                      <span style={{fontSize:'2rem'}}>🖼️</span>
+                      <p>Click to upload reference image</p>
+                    </div>
+                  )}
+                </div>
+                <input 
+                  id="refImg" 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if(file) {
+                      setRefPreview(URL.createObjectURL(file));
+                      setRefFile(file); // Saves the actual file to state so you can send it to your backend
+                    }
+                  }} 
+                  style={{display:'none'}} 
+                />
+              </div>
+              {/* === END NEW IMAGE UPLOAD SNIPPET === */}
 
               <div className="ig-tips">
                 <p>💡 Tips for better results:</p>
