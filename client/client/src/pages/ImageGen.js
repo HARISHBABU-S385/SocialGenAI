@@ -17,7 +17,7 @@ const ImageGen = () => {
   
   // NEW: State for the reference image upload
   const [refPreview, setRefPreview] = useState(null);
-  const [refFile, setRefFile] = useState(null);
+ 
 
   const handleGenerate = async (e) => {
     e.preventDefault();
