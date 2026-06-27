@@ -62,6 +62,7 @@ const PlatformSelect = () => {
         <div className="ps-nav-links">
           <span className="ps-user">Hi, {user?.name} 👋</span>
           <button className="ps-nav-btn" onClick={() => navigate('/history')}>History</button>
+          <button className="ps-nav-btn" onClick={() => navigate('/imagegen')}>🎨 AI Image</button>
           <button className="ps-logout-btn" onClick={logout}>Logout</button>
         </div>
       </nav>
