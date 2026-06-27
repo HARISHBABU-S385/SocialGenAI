@@ -7,7 +7,7 @@ import './ImageGen.css';
 const ImageGen = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [refPreview, setRefPreview] = useState(null);
+
   
   // Existing state
   const [prompt, setPrompt] = useState('');
