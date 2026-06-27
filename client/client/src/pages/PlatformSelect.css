@@ -320,4 +320,3 @@
   .platform-grid { grid-template-columns: 1fr; }
   .platform-header h1 { font-size: 1.8rem; }
 }
-<button className="ps-nav-btn" onClick={() => navigate('/imagegen')}>🎨 AI Image</button>
