@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './PlatformSelect.css';
@@ -10,7 +10,10 @@ const platforms = [
     name: 'Instagram',
     desc: 'Reels, Stories & Posts',
     color: '#e1306c',
-    bg: '#2a0a1a'
+    gradient: 'linear-gradient(135deg, #833ab4, #e1306c, #f77737)',
+    bg: 'rgba(225, 48, 108, 0.08)',
+    glow: 'rgba(225, 48, 108, 0.3)',
+    users: '2B+ Users'
   },
   {
     id: 'Twitter',
@@ -18,7 +21,10 @@ const platforms = [
     name: 'Twitter / X',
     desc: 'Tweets & Threads',
     color: '#1da1f2',
-    bg: '#0a1a2a'
+    gradient: 'linear-gradient(135deg, #1da1f2, #0d8bd9)',
+    bg: 'rgba(29, 161, 242, 0.08)',
+    glow: 'rgba(29, 161, 242, 0.3)',
+    users: '450M+ Users'
   },
   {
     id: 'LinkedIn',
@@ -26,7 +32,10 @@ const platforms = [
     name: 'LinkedIn',
     desc: 'Professional Content',
     color: '#0077b5',
-    bg: '#0a1520'
+    gradient: 'linear-gradient(135deg, #0077b5, #005885)',
+    bg: 'rgba(0, 119, 181, 0.08)',
+    glow: 'rgba(0, 119, 181, 0.3)',
+    users: '900M+ Users'
   },
   {
     id: 'Facebook',
@@ -34,49 +43,86 @@ const platforms = [
     name: 'Facebook',
     desc: 'Posts & Campaigns',
     color: '#1877f2',
-    bg: '#0a1020'
+    gradient: 'linear-gradient(135deg, #1877f2, #0d65d9)',
+    bg: 'rgba(24, 119, 242, 0.08)',
+    glow: 'rgba(24, 119, 242, 0.3)',
+    users: '3B+ Users'
   }
 ];
 
 const PlatformSelect = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  const handleSelect = (platformId) => {
-    navigate(`/generate/${platformId}`);
-  };
+  const [hoveredId, setHoveredId] = useState(null);
 
   return (
     <div className="platform-page">
-      <nav className="navbar">
-        <span className="navbar-brand">⚡ SocialGenAI</span>
-        <div className="navbar-links">
-          <span className="navbar-user">Hi, {user?.name}</span>
-          <button className="nav-link" onClick={() => navigate('/history')}>History</button>
-          <button className="btn btn-outline" onClick={logout}>Logout</button>
+      <nav className="ps-navbar">
+        <span className="ps-brand">⚡ SocialGenAI</span>
+        <div className="ps-nav-links">
+          <span className="ps-user">Hi, {user?.name} 👋</span>
+          <button className="ps-nav-btn" onClick={() => navigate('/history')}>History</button>
+          <button className="ps-logout-btn" onClick={logout}>Logout</button>
         </div>
       </nav>
 
       <div className="platform-container">
         <div className="platform-header">
+          <div className="header-badge">✨ AI-Powered Content</div>
           <h1>Choose Your Platform</h1>
-          <p>Select the social media platform you want to create content for</p>
+          <p>Select the social media platform and let AI create viral content for you</p>
         </div>
 
         <div className="platform-grid">
           {platforms.map((platform) => (
             <div
               key={platform.id}
-              className="platform-card"
-              style={{ '--platform-color': platform.color, '--platform-bg': platform.bg }}
-              onClick={() => handleSelect(platform.id)}
+              className={`platform-card ${hoveredId === platform.id ? 'hovered' : ''}`}
+              style={{
+                '--platform-color': platform.color,
+                '--platform-gradient': platform.gradient,
+                '--platform-bg': platform.bg,
+                '--platform-glow': platform.glow,
+              }}
+              onClick={() => navigate(`/generate/${platform.id}`)}
+              onMouseEnter={() => setHoveredId(platform.id)}
+              onMouseLeave={() => setHoveredId(null)}
             >
-              <div className="platform-icon">{platform.icon}</div>
-              <h3>{platform.name}</h3>
-              <p>{platform.desc}</p>
-              <div className="platform-arrow">→</div>
+              <div className="card-glow"></div>
+              <div className="card-inner">
+                <div className="platform-icon-wrapper">
+                  <div className="platform-icon-bg"></div>
+                  <span className="platform-icon">{platform.icon}</span>
+                </div>
+                <div className="platform-info">
+                  <h3>{platform.name}</h3>
+                  <p>{platform.desc}</p>
+                  <span className="platform-users">{platform.users}</span>
+                </div>
+                <div className="platform-arrow">
+                  <span>→</span>
+                </div>
+              </div>
+              <div className="card-shine"></div>
             </div>
           ))}
+        </div>
+
+        <div className="platform-footer">
+          <div className="footer-stat">
+            <span className="stat-number">10+</span>
+            <span className="stat-label">AI Features</span>
+          </div>
+          <div className="footer-divider"></div>
+          <div className="footer-stat">
+            <span className="stat-number">4</span>
+            <span className="stat-label">Platforms</span>
+          </div>
+          <div className="footer-divider"></div>
+          <div className="footer-stat">
+            <span className="stat-number">∞</span>
+            <span className="stat-label">Content Ideas</span>
+          </div>
         </div>
       </div>
     </div>
