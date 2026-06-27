@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { generatePost, generateFromImage, savePost } from '../services/api';
+import { generatePost, generateFromImage, savePost, generateImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Generator.css';
 
@@ -21,6 +21,9 @@ const Generator = () => {
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('caption');
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [imageGenLoading, setImageGenLoading] = useState(false);
+  const [imageGenError, setImageGenError] = useState('');
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -74,13 +77,30 @@ const Generator = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const tabs = [
-    { id: 'caption', label: '📝 Caption' },
-    { id: 'script', label: '🎬 Script' },
-    { id: 'hooks', label: '🪝 Hooks' },
-    { id: 'trending', label: '🔥 Trending' },
-    { id: 'timing', label: '⏰ Timing' },
-  ];
+const tabs = [
+  { id: 'caption', label: '📝 Caption' },
+  { id: 'script', label: '🎬 Script' },
+  { id: 'hooks', label: '🪝 Hooks' },
+  { id: 'trending', label: '🔥 Trending' },
+  { id: 'timing', label: '⏰ Timing' },
+  { id: 'imagegen', label: '🎨 AI Image' },
+];
+
+  const handleImageGenerate = async () => {
+  setImageGenLoading(true);
+  setImageGenError('');
+  setGeneratedImage(null);
+  try {
+    const imagePrompt = result?.caption
+      ? `${topic}, ${platform} post, ${tone} style, high quality, professional photography`
+      : topic;
+    const res = await generateImage({ prompt: imagePrompt });
+    setGeneratedImage(res.data.image);
+  } catch (err) {
+    setImageGenError('Image generation failed. Try again.');
+  }
+  setImageGenLoading(false);
+};
 
   return (
     <div className="generator-page">
@@ -224,6 +244,50 @@ const Generator = () => {
                         <p className="result-text">{result.imageDescription}</p>
                       </div>
                     )}
+                    {activeTab === 'imagegen' && (
+              <div className="imagegen-section">
+                <div className="result-section">
+                  <label>🎨 AI Image Generator</label>
+                  <p className="imagegen-hint">
+                    Generate a custom image based on your content topic for {platform}
+                  </p>
+                </div>
+
+                <div className="imagegen-prompt">
+                  <p className="prompt-preview">
+                    Prompt: <span>{topic}, {platform} post, {tone} style</span>
+                  </p>
+                </div>
+
+                <button
+                  className="generate-btn"
+                  onClick={handleImageGenerate}
+                  disabled={imageGenLoading}
+                  style={{ marginBottom: '1rem' }}
+                >
+                  {imageGenLoading ? '⏳ Generating Image...' : '🎨 Generate Image'}
+                </button>
+
+                {imageGenError && <div className="gen-error">{imageGenError}</div>}
+
+                {imageGenLoading && (
+                  <div className="imagegen-loading">
+                    <div className="spinner"></div>
+                    <p>AI is creating your image...</p>
+                    <small>This may take 20-30 seconds</small>
+                  </div>
+                )}
+
+                {generatedImage && (
+                  <div className="imagegen-result">
+                    <img src={generatedImage} alt="AI Generated" className="generated-image" />
+                    <a href={generatedImage} download="socialgenai-image.png" className="action-btn primary" style={{ display: 'block', textAlign: 'center', marginTop: '1rem', textDecoration: 'none', padding: '0.75rem', borderRadius: '8px' }}>
+                      ⬇️ Download Image
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
                     <div className="result-section">
                       <label>📝 Caption</label>
                       <p className="result-text">{result.caption}</p>

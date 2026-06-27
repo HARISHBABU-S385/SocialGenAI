@@ -20,6 +20,8 @@ const generateRoutes = require('./routes/generate');
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/generate', generateRoutes);
+const imageGenerateRoutes = require('./routes/imagegenerate');
+app.use('/api/imagegenerate', imageGenerateRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
