@@ -262,3 +262,29 @@
   .imagegen-container { grid-template-columns: 1fr; height: auto; }
   .ai-image-card { grid-column: span 1; }
 }
+.ig-upload-area {
+  border: 1px dashed rgba(77,166,255,0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8,13,26,0.5);
+}
+
+.ig-upload-area:hover { border-color: rgba(77,166,255,0.4); }
+
+.ig-upload-placeholder span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+.ig-upload-placeholder p { color: #7a9abf; font-size: 0.85rem; }
+.ig-upload-placeholder small { color: #4a6a8a; font-size: 0.78rem; }
+
+.ig-upload-preview { position: relative; width: 100%; }
+.ig-ref-image { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; }
+.ig-remove-btn { margin-top: 0.5rem; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.3); color: #ff6b7a; padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+
+.ig-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.ig-compare-label { color: #4a6a8a; font-size: 0.82rem; text-align: center; margin-bottom: 0.5rem; }
