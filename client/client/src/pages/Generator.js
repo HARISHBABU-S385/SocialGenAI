@@ -45,6 +45,7 @@ const Generator = () => {
         formData.append('image', image);
         formData.append('platform', platform);
         formData.append('tone', tone);
+        formData.append('topic', topic);
         res = await generateFromImage(formData);
       } else {
         res = await generatePost({ topic, platform, tone });
@@ -114,41 +115,52 @@ const Generator = () => {
             </button>
           </div>
 
-          <form onSubmit={handleGenerate} className="generator-form">
-            {mode === 'text' ? (
-              <div className="form-group">
-                <label>Topic / Keywords</label>
-                <textarea
-                  placeholder={`e.g. Launching a new product on ${platform}...`}
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  rows={4}
-                  required
-                />
-              </div>
-            ) : (
-              <div className="form-group">
-                <label>Upload Image</label>
-                <div className="image-upload-area" onClick={() => document.getElementById('imageInput').click()}>
-                  {imagePreview ? (
-                    <img src={imagePreview} alt="preview" className="image-preview" />
-                  ) : (
-                    <div className="upload-placeholder">
-                      <span>🖼️</span>
-                      <p>Click to upload image</p>
-                      <small>JPG, PNG supported</small>
-                    </div>
-                  )}
-                </div>
-                <input
-                  id="imageInput"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  style={{ display: 'none' }}
-                />
-              </div>
-            )}
+          {mode === 'image' ? (
+  <div>
+    <div className="form-group">
+      <label>Upload Image</label>
+      <div className="image-upload-area" onClick={() => document.getElementById('imageInput').click()}>
+        {imagePreview ? (
+          <img src={imagePreview} alt="preview" className="image-preview" />
+        ) : (
+          <div className="upload-placeholder">
+            <span>🖼️</span>
+            <p>Click to upload image</p>
+            <small>JPG, PNG supported</small>
+          </div>
+        )}
+      </div>
+      <input
+        id="imageInput"
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        style={{ display: 'none' }}
+      />
+    </div>
+
+    <div className="form-group">
+      <label>Describe your image or add extra instructions</label>
+      <textarea
+        placeholder="e.g. This is a photo of my new cafe interior, focus on the cozy atmosphere and wooden decor..."
+        value={topic}
+        onChange={(e) => setTopic(e.target.value)}
+        rows={3}
+      />
+    </div>
+  </div>
+) : (
+  <div className="form-group">
+    <label>Topic / Keywords</label>
+    <textarea
+      placeholder={`e.g. Launching a new product on ${platform}...`}
+      value={topic}
+      onChange={(e) => setTopic(e.target.value)}
+      rows={4}
+      required
+    />
+  </div>
+)}
 
             <div className="form-group">
               <label>Tone</label>

@@ -119,6 +119,7 @@ Respond ONLY in this exact JSON format with no extra text:
 });
 
 // --- IMAGE GENERATE ROUTE ---
+// --- IMAGE GENERATE ROUTE ---
 router.post('/image', auth, upload.single('image'), async (req, res) => {
   try {
     const { platform, tone } = req.body;
@@ -126,25 +127,9 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
 
     if (!imageFile) return res.status(400).json({ message: 'No image uploaded' });
 
-    const prompt = `
-You are a professional social media content creator.
-A user has uploaded an image and wants to create ${platform} content in a ${tone} tone based on it.
-Since you cannot see the image directly, generate versatile and creative content that would work well for a ${platform} post with ${tone} tone.
-
-Respond ONLY in this exact JSON format with no extra text:
-{
-  "imageDescription": "Creative description assuming this is a lifestyle/product/event photo perfect for ${platform}",
-  "caption": "engaging caption for ${platform}",
-  "hashtags": ["hashtag1", "hashtag2", "hashtag3", "hashtag4", "hashtag5"],
-  "callToAction": "strong call to action",
-  "postIdeas": ["idea 1", "idea 2", "idea 3"],
-  "script": "30-60 second video script for this content",
-  "hooks": ["hook 1", "hook 2", "hook 3"],
-  "nicheOfDay": "relevant niche category",
-  "trendingTopics": ["trending topic 1", "trending topic 2", "trending topic 3"],
-  "viralSuggestions": ["viral idea 1", "viral idea 2", "viral idea 3"]
-}
-`;
+    // === NEW UPGRADED IMAGE PROMPT STARTS HERE ===
+    const prompt = `You are a viral social media content creator.A user uploaded an image and described it as: "${req.body.topic || 'no description provided'}"Create ${platform} content in ${tone} tone based on this description and image context.Respond ONLY in this exact JSON format:{  "imageDescription": "Describe what kind of image this likely is based on the user description",  "caption": "Write a deeply human, engaging caption based on the image description. Sound like a real person.",  "hashtags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10"],  "callToAction": "Natural conversational CTA",  "postIdeas": ["idea 1", "idea 2", "idea 3"],  "script": "Full natural video script based on the image context. Minimum 300 words.",  "hooks": ["hook 1", "hook 2", "hook 3"],  "nicheOfDay": "relevant niche",  "trendingTopics": ["topic 1", "topic 2", "topic 3"],  "viralSuggestions": ["strategy 1", "strategy 2", "strategy 3"]}`;
+    // === NEW UPGRADED IMAGE PROMPT ENDS HERE ===
 
     const completion = await groq.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
@@ -157,6 +142,7 @@ Respond ONLY in this exact JSON format with no extra text:
     const generated = JSON.parse(cleaned);
     const timing = postingTimes[platform] || postingTimes['Instagram'];
 
+    // Clean up the uploaded image from the server
     fs.unlinkSync(imageFile.path);
 
     const post = new Post({
