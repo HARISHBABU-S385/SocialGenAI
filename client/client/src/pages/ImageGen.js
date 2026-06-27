@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { generateImage, saveGeneratedImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './ImageGen.css';
 
@@ -11,26 +12,38 @@ const ImageGen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [refPreview, setRefPreview] = useState(null);
+  const [saved, setSaved] = useState(false);
 
-const handleGenerate = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
-  setImage(null);
-  try {
-    let finalPrompt = prompt;
-    if (refPreview) {
-      finalPrompt = `recreate this image style: ${prompt}, same composition and mood`;
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setImage(null);
+    setSaved(false);
+    try {
+      let finalPrompt = prompt;
+      if (refPreview) {
+        finalPrompt = `recreate this image style: ${prompt}, same composition and mood`;
+      }
+      finalPrompt += ', ultra realistic, 8k, professional photography, clean background, no watermark';
+      const encodedPrompt = encodeURIComponent(finalPrompt);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+      setImage(imageUrl);
+    } catch (err) {
+      setError('Generation failed. Try again.');
     }
-   finalPrompt += ', ultra realistic, 8k, professional photography, clean background, no watermark';
-    const encodedPrompt = encodeURIComponent(finalPrompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
-    setImage(imageUrl);
-  } catch (err) {
-    setError('Generation failed. Try again.');
-  }
-  setLoading(false);
-};
+    setLoading(false);
+  };
+
+  const handleSave = async () => {
+    try {
+      await saveGeneratedImage({ imageUrl: image, prompt });
+      setSaved(true);
+    } catch (err) {
+      setError('Save failed.');
+    }
+  };
+
   return (
     <div className="imagegen-page">
       <nav className="ig-navbar">
@@ -68,10 +81,10 @@ const handleGenerate = async (e) => {
                 <label>Or upload an image to recreate</label>
                 <div className="ig-upload-area" onClick={() => document.getElementById('refImg').click()}>
                   {refPreview ? (
-                    <img src={refPreview} alt="ref" style={{maxHeight:'120px', borderRadius:'8px'}} />
+                    <img src={refPreview} alt="ref" style={{ maxHeight: '120px', borderRadius: '8px' }} />
                   ) : (
                     <div>
-                      <span style={{fontSize:'2rem'}}>🖼️</span>
+                      <span style={{ fontSize: '2rem' }}>🖼️</span>
                       <p>Click to upload reference image</p>
                     </div>
                   )}
@@ -82,9 +95,9 @@ const handleGenerate = async (e) => {
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files[0];
-                    if(file) setRefPreview(URL.createObjectURL(file));
+                    if (file) setRefPreview(URL.createObjectURL(file));
                   }}
-                  style={{display:'none'}}
+                  style={{ display: 'none' }}
                 />
               </div>
 
@@ -123,29 +136,34 @@ const handleGenerate = async (e) => {
             )}
 
             {image && (
-  <div className="ig-result">
-    {refPreview && (
-      <div className="ig-compare">
-        <div>
-          <p className="ig-compare-label">Original</p>
-          <img src={refPreview} alt="Original" className="ig-image" />
-        </div>
-        <div>
-          <p className="ig-compare-label">AI Recreated</p>
-          <img src={image} alt="AI Generated" className="ig-image" />
-        </div>
-      </div>
-    )}
-    {!refPreview && <img src={image} alt="AI Generated" className="ig-image" />}
-    <div className="ig-result-actions">
-      <a href={image} download="socialgenai-image.png" className="ig-download-btn">⬇️ Download</a>
-      <button className="ig-regen-btn" onClick={() => { setImage(null); setRefPreview(null); }}>🔄 Generate Another</button>
-      <button className="ig-save-btn" onClick={handleSave} disabled={saved}>
-        {saved ? '✅ Saved' : '💾 Save Image'}
-      </button>
-    </div>
-  </div>
-)}
+              <div className="ig-result">
+                {refPreview ? (
+                  <div className="ig-compare">
+                    <div>
+                      <p className="ig-compare-label">Original</p>
+                      <img src={refPreview} alt="Original" className="ig-image" />
+                    </div>
+                    <div>
+                      <p className="ig-compare-label">AI Recreated</p>
+                      <img src={image} alt="AI Generated" className="ig-image" />
+                    </div>
+                  </div>
+                ) : (
+                  <img src={image} alt="AI Generated" className="ig-image" />
+                )}
+                <div className="ig-result-actions">
+                  <a href={image} download="socialgenai-image.png" className="ig-download-btn">
+                    ⬇️ Download
+                  </a>
+                  <button className="ig-regen-btn" onClick={handleSave} disabled={saved}>
+                    {saved ? '✅ Saved' : '💾 Save to History'}
+                  </button>
+                  <button className="ig-regen-btn" onClick={() => { setImage(null); setRefPreview(null); setSaved(false); }}>
+                    🔄 New
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
