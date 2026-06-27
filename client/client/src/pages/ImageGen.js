@@ -18,7 +18,11 @@ const handleGenerate = async (e) => {
   setError('');
   setImage(null);
   try {
-    const encodedPrompt = encodeURIComponent(prompt);
+    let finalPrompt = prompt;
+    if (refPreview) {
+      finalPrompt = `recreate this image style: ${prompt}, same composition and mood, high quality`;
+    }
+    const encodedPrompt = encodeURIComponent(finalPrompt);
     const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
     setImage(imageUrl);
   } catch (err) {
@@ -118,18 +122,26 @@ const handleGenerate = async (e) => {
             )}
 
             {image && (
-              <div className="ig-result">
-                <img src={image} alt="AI Generated" className="ig-image" />
-                <div className="ig-result-actions">
-                  <a href={image} download="socialgenai-image.png" className="ig-download-btn">
-                    ⬇️ Download Image
-                  </a>
-                  <button className="ig-regen-btn" onClick={() => setImage(null)}>
-                    🔄 Generate Another
-                  </button>
-                </div>
-              </div>
-            )}
+  <div className="ig-result">
+    {refPreview && (
+      <div className="ig-compare">
+        <div>
+          <p className="ig-compare-label">Original</p>
+          <img src={refPreview} alt="Original" className="ig-image" />
+        </div>
+        <div>
+          <p className="ig-compare-label">AI Recreated</p>
+          <img src={image} alt="AI Generated" className="ig-image" />
+        </div>
+      </div>
+    )}
+    {!refPreview && <img src={image} alt="AI Generated" className="ig-image" />}
+    <div className="ig-result-actions">
+      <a href={image} download="socialgenai-image.png" className="ig-download-btn">⬇️ Download</a>
+      <button className="ig-regen-btn" onClick={() => { setImage(null); setRefPreview(null); }}>🔄 Generate Another</button>
+    </div>
+  </div>
+)}
           </div>
         </div>
       </div>

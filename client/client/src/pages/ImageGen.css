@@ -117,3 +117,5 @@
   transition: border 0.3s;
 }
 .ig-upload-area:hover { border-color: rgba(77,166,255,0.4); }
+.ig-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.ig-compare-label { color: #4a6a8a; font-size: 0.8rem; text-align: center; margin-bottom: 0.5rem; }
