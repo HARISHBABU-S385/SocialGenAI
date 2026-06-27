@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import './ImageGenerate.css';
+import './ImageGen.css';
 import PageTransition from '../components/PageTransition';
 
 const ImageGenerate = () => {
