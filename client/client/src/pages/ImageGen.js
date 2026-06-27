@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generateImage, saveGeneratedImage } from '../services/api';
+import { saveGeneratedImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './ImageGen.css';
 
