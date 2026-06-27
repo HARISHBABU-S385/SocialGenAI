@@ -23,7 +23,7 @@ function App() {
           <Route path="/" element={<PrivateRoute><PlatformSelect /></PrivateRoute>} />
           <Route path="/generate/:platform" element={<PrivateRoute><Generator /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
-          <Route path="/imagegenerate" element={<PrivateRoute><ImageGenerate /></PrivateRoute>} />
+          <Route path="/imagegenerate" element={<PrivateRoute><ImageGen /></PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
