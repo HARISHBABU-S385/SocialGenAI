@@ -3,25 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { login, register } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
-import PageTransition from '../components/PageTransition';
 
-const Auth = () => {
+const Login = () => {
   const [isActive, setIsActive] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [registerError, setRegisterError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotPassword, setForgotPassword] = useState('');
+  const [forgotMsg, setForgotMsg] = useState('');
   const { login: authLogin } = useAuth();
   const navigate = useNavigate();
 
-  const handleLoginChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
-
-  const handleRegisterChange = (e) => {
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
-  };
+  const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  const handleRegisterChange = (e) => setRegisterData({ ...registerData, [e.target.name]: e.target.value });
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -49,32 +47,52 @@ const Auth = () => {
       setRegisterError(err.response?.data?.message || 'Registration failed');
     }
     setLoading(false);
-    const [showForgot, setShowForgot] = useState(false);
-const [forgotEmail, setForgotEmail] = useState('');
-const [forgotPassword, setForgotPassword] = useState('');
-const [forgotMsg, setForgotMsg] = useState('');
-const handleForgot = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch('https://socialgenai-backend.onrender.com/api/auth/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: forgotEmail, newPassword: forgotPassword })
-    });
-    const data = await res.json();
-    if (res.ok) setForgotMsg('Password updated! Please login.');
-    else setForgotMsg(data.message);
-  } catch (err) {
-    setForgotMsg('Failed. Try again.');
-  }
-};
+  };
+
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('https://socialgenai-backend.onrender.com/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail, newPassword: forgotPassword })
+      });
+      const data = await res.json();
+      if (res.ok) setForgotMsg('Password updated! Please login.');
+      else setForgotMsg(data.message);
+    } catch (err) {
+      setForgotMsg('Failed. Try again.');
+    }
   };
 
   return (
-     <PageTransition>
     <div className="auth-wrapper">
-      <div className={`auth-container ${isActive ? 'active' : ''}`}>
+      {showForgot && (
+        <div className="forgot-overlay">
+          <div className="forgot-box">
+            <h3>Reset Password</h3>
+            <form onSubmit={handleForgot}>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" placeholder="Your email" value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label>New Password</label>
+                <input type="password" placeholder="New password" value={forgotPassword}
+                  onChange={(e) => setForgotPassword(e.target.value)} required />
+              </div>
+              {forgotMsg && <p className="forgot-msg">{forgotMsg}</p>}
+              <button type="submit" className="auth-btn">Update Password</button>
+              <button type="button" className="auth-btn"
+                style={{ background: 'transparent', border: '1px solid rgba(77,166,255,0.2)', marginTop: '0.5rem' }}
+                onClick={() => setShowForgot(false)}>Cancel</button>
+            </form>
+          </div>
+        </div>
+      )}
 
+      <div className={`auth-container ${isActive ? 'active' : ''}`}>
         <div className="form-box login">
           <h2>Login</h2>
           <p className="auth-subtitle">Welcome back to SocialGenAI</p>
@@ -82,30 +100,19 @@ const handleForgot = async (e) => {
           <form onSubmit={handleLogin}>
             <div className="form-group">
               <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={loginData.email}
-                onChange={handleLoginChange}
-                required
-              />
+              <input type="email" name="email" placeholder="Enter your email"
+                value={loginData.email} onChange={handleLoginChange} required />
             </div>
             <div className="form-group">
               <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                value={loginData.password}
-                onChange={handleLoginChange}
-                required
-              />
+              <input type="password" name="password" placeholder="Enter your password"
+                value={loginData.password} onChange={handleLoginChange} required />
             </div>
             <button type="submit" className="auth-btn" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
+          <p className="forgot-link" onClick={() => setShowForgot(true)}>Forgot password?</p>
           <p className="auth-switch">
             Don't have an account?{' '}
             <span onClick={() => setIsActive(true)}>Register</span>
@@ -119,60 +126,18 @@ const handleForgot = async (e) => {
           <form onSubmit={handleRegister}>
             <div className="form-group">
               <label>Full Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter your name"
-                value={registerData.name}
-                onChange={handleRegisterChange}
-                required
-              />
+              <input type="text" name="name" placeholder="Enter your name"
+                value={registerData.name} onChange={handleRegisterChange} required />
             </div>
-            {showForgot && (
-  <div className="forgot-overlay">
-    <div className="forgot-box">
-      <h3>Reset Password</h3>
-      <form onSubmit={handleForgot}>
-        <div className="form-group">
-          <label>Email</label>
-          <input type="email" placeholder="Your email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required />
-        </div>
-        <div className="form-group">
-          <label>New Password</label>
-          <input type="password" placeholder="New password" value={forgotPassword} onChange={(e) => setForgotPassword(e.target.value)} required />
-        </div>
-        {forgotMsg && <p className="forgot-msg">{forgotMsg}</p>}
-        <button type="submit" className="auth-btn">Update Password</button>
-        <button type="button" className="auth-btn" style={{background:'transparent', border:'1px solid rgba(77,166,255,0.2)', marginTop:'0.5rem'}} onClick={() => setShowForgot(false)}>Cancel</button>
-      </form>
-    </div>
-  </div>
-)}
-<p className="forgot-link" onClick={() => setShowForgot(true)}>
-  Forgot password?
-</p>
-
             <div className="form-group">
               <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={registerData.email}
-                onChange={handleRegisterChange}
-                required
-              />
+              <input type="email" name="email" placeholder="Enter your email"
+                value={registerData.email} onChange={handleRegisterChange} required />
             </div>
             <div className="form-group">
               <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Create a password"
-                value={registerData.password}
-                onChange={handleRegisterChange}
-                required
-              />
+              <input type="password" name="password" placeholder="Create a password"
+                value={registerData.password} onChange={handleRegisterChange} required />
             </div>
             <button type="submit" className="auth-btn" disabled={loading}>
               {loading ? 'Creating Account...' : 'Register'}
@@ -189,25 +154,18 @@ const handleForgot = async (e) => {
             <div className="brand-logo">⚡ SocialGenAI</div>
             <h1>Welcome Back!</h1>
             <p>AI-powered content for every platform</p>
-            <button className="toggle-btn" onClick={() => setIsActive(true)}>
-              Register
-            </button>
+            <button className="toggle-btn" onClick={() => setIsActive(true)}>Register</button>
           </div>
           <div className="toggle-panel toggle-right">
-  <div className="brand-logo">⚡ SocialGenAI</div>
-  <h1>Join SocialGenAI</h1>
-  <p>Create stunning content with AI in seconds</p>
-  <button className="toggle-btn" onClick={() => setIsActive(true)}>
-    Register
-  </button>
-</div>
+            <div className="brand-logo">⚡ SocialGenAI</div>
+            <h1>Join SocialGenAI</h1>
+            <p>Create stunning content with AI in seconds</p>
+            <button className="toggle-btn" onClick={() => setIsActive(false)}>Login</button>
+          </div>
         </div>
-
       </div>
     </div>
-     </PageTransition>
   );
 };
 
-
-export default Auth;
+export default Login;
