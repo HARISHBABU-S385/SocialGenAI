@@ -20,8 +20,9 @@ const handleGenerate = async (e) => {
   try {
     let finalPrompt = prompt;
     if (refPreview) {
-      finalPrompt = `recreate this image style: ${prompt}, same composition and mood, high quality`;
+      finalPrompt = `recreate this image style: ${prompt}, same composition and mood`;
     }
+    finalPrompt += ', no text, no words, no letters, no watermark, high quality, professional photography';
     const encodedPrompt = encodeURIComponent(finalPrompt);
     const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
     setImage(imageUrl);
