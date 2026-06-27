@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generateImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './ImageGen.css';
 
@@ -13,20 +12,20 @@ const ImageGen = () => {
   const [error, setError] = useState('');
   const [refPreview, setRefPreview] = useState(null);
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setImage(null);
-    try {
-      const res = await generateImage({ prompt });
-      setImage(res.data.image);
-    } catch (err) {
-      setError('Generation failed. Try again in 30 seconds.');
-    }
-    setLoading(false);
-  };
-
+const handleGenerate = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setImage(null);
+  try {
+    const encodedPrompt = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+    setImage(imageUrl);
+  } catch (err) {
+    setError('Generation failed. Try again.');
+  }
+  setLoading(false);
+};
   return (
     <div className="imagegen-page">
       <nav className="ig-navbar">
