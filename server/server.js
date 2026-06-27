@@ -7,15 +7,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    'https://social-gen-ai.vercel.app',
-    'https://social-gen-ai-neon.vercel.app',
-    'https://social-gen-ai-beta.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:3001'
-  ]
-}));
+app.use(cors());
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
