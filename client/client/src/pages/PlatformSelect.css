@@ -1,8 +1,6 @@
 .platform-page {
   min-height: 100vh;
-  background: #0a0f1e;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, #0a0010, #0d0a1e, #0a1020);
 }
 
 .platform-page::before {
