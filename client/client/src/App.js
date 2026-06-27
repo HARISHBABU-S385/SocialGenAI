@@ -6,6 +6,8 @@ import PlatformSelect from './pages/PlatformSelect';
 import Generator from './pages/Generator';
 import History from './pages/History';
 import './App.css';
+import ImageGen from './pages/ImageGen';
+
 
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useAuth();
@@ -22,6 +24,7 @@ function App() {
           <Route path="/" element={<PrivateRoute><PlatformSelect /></PrivateRoute>} />
           <Route path="/generate/:platform" element={<PrivateRoute><Generator /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
+          <Route path="/imagegen" element={<PrivateRoute><ImageGen /></PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
@@ -29,3 +32,5 @@ function App() {
 }
 
 export default App;
+
+
