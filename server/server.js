@@ -15,7 +15,7 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 const generateRoutes = require('./routes/generate');
-const imageGenerateRoutes = require('./routes/ImageGen');
+const imageGenerateRoutes = require('./routes/imagegenerate');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
