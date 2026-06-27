@@ -1,21 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const Post = require('../models/Post');
 
-// --- IMAGE GENERATION ROUTE (Using Pollinations AI URL) ---
-router.post('/', auth, async (req, res) => {
+router.post('/save', auth, async (req, res) => {
   try {
-    const { prompt } = req.body;
-    
-    // Safely encode the prompt so spaces and special characters don't break the URL
-    const encodedPrompt = encodeURIComponent(prompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true`;
-    
-    // Returns the direct link to the frontend
-    res.json({ image: imageUrl });
+    const { imageUrl, prompt } = req.body;
+    const post = new Post({
+      userId: req.user.id,
+      topic: prompt,
+      platform: 'AI Image',
+      tone: 'visual',
+      caption: prompt,
+      hashtags: [],
+      callToAction: '',
+      postIdeas: [],
+      isSaved: true,
+      imageUrl: imageUrl
+    });
+    await post.save();
+    res.json({ success: true });
   } catch (err) {
-    console.error('Generation failed:', err.message);
-    res.status(500).json({ message: 'Generation failed' });
+    res.status(500).json({ message: 'Save failed' });
   }
 });
 

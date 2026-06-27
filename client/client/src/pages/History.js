@@ -107,7 +107,12 @@ const History = () => {
               </div>
 
               <h2 className="detail-topic">{selectedPost.topic}</h2>
-
+     {selectedPost.imageUrl && (
+  <div className="detail-section">
+    <label>🎨 Saved Image</label>
+    <img src={selectedPost.imageUrl} alt="saved" style={{width:'100%', borderRadius:'10px'}} />
+  </div>
+)}         
               <div className="detail-section">
                 <label>📝 Caption</label>
                 <p className="detail-text">{selectedPost.caption}</p>

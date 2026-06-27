@@ -21,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/generate', generateRoutes);
 const imageGenerateRoutes = require('./routes/imagegenerate');
+const [saved, setSaved] = useState(false);
 app.use('/api/imagegenerate', imageGenerateRoutes);
 
 // MongoDB Connection
@@ -30,3 +31,11 @@ mongoose.connect(process.env.MONGO_URI)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const handleSave = async () => {
+  try {
+    await saveGeneratedImage({ imageUrl: image, prompt });
+    setSaved(true);
+  } catch (err) {
+    setError('Save failed.');
+  }
+};

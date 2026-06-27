@@ -140,6 +140,9 @@ const handleGenerate = async (e) => {
     <div className="ig-result-actions">
       <a href={image} download="socialgenai-image.png" className="ig-download-btn">⬇️ Download</a>
       <button className="ig-regen-btn" onClick={() => { setImage(null); setRefPreview(null); }}>🔄 Generate Another</button>
+      <button className="ig-save-btn" onClick={handleSave} disabled={saved}>
+        {saved ? '✅ Saved' : '💾 Save Image'}
+      </button>
     </div>
   </div>
 )}

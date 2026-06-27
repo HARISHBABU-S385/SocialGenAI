@@ -21,3 +21,4 @@ export const getSavedPosts = () => API.get('/posts/saved');
 export const savePost = (id) => API.put(`/posts/save/${id}`);
 export const deletePost = (id) => API.delete(`/posts/${id}`);
 export const generateImage = (data) => API.post('/imagegenerate', data);
+export const saveGeneratedImage = (data) => API.post('/imagegenerate/save', data);
