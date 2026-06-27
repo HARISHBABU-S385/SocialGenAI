@@ -65,6 +65,16 @@ const PlatformSelect = () => {
           <button className="ps-logout-btn" onClick={logout}>Logout</button>
         </div>
       </nav>
+    
+    <div className="floating-icons">
+  {['📸','🐦','💼','👥','📸','🐦','💼','👥'].map((icon,i) => (
+    <span key={i} className="float-icon" style={{
+      '--delay': `${i * 1.2}s`,
+      '--x': `${10 + i * 12}%`,
+      '--size': `${1.5 + (i % 3) * 0.5}rem`
+    }}>{icon}</span>
+  ))}
+</div> 
 
       <div className="platform-container">
         <div className="platform-header">
