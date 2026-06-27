@@ -40,7 +40,6 @@ const Generator = () => {
     setResult(null);
     setSaved(false);
     setActiveTab('caption');
-
     try {
       let res;
       if (mode === 'image' && image) {
@@ -77,30 +76,28 @@ const Generator = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-const tabs = [
-  { id: 'caption', label: '📝 Caption' },
-  { id: 'script', label: '🎬 Script' },
-  { id: 'hooks', label: '🪝 Hooks' },
-  { id: 'trending', label: '🔥 Trending' },
-  { id: 'timing', label: '⏰ Timing' },
-  { id: 'imagegen', label: '🎨 AI Image' },
-];
-
   const handleImageGenerate = async () => {
-  setImageGenLoading(true);
-  setImageGenError('');
-  setGeneratedImage(null);
-  try {
-    const imagePrompt = result?.caption
-      ? `${topic}, ${platform} post, ${tone} style, high quality, professional photography`
-      : topic;
-    const res = await generateImage({ prompt: imagePrompt });
-    setGeneratedImage(res.data.image);
-  } catch (err) {
-    setImageGenError('Image generation failed. Try again.');
-  }
-  setImageGenLoading(false);
-};
+    setImageGenLoading(true);
+    setImageGenError('');
+    setGeneratedImage(null);
+    try {
+      const imagePrompt = `${topic}, ${platform} post, ${tone} style, high quality, professional photography`;
+      const res = await generateImage({ prompt: imagePrompt });
+      setGeneratedImage(res.data.image);
+    } catch (err) {
+      setImageGenError('Image generation failed. Try again.');
+    }
+    setImageGenLoading(false);
+  };
+
+  const tabs = [
+    { id: 'caption', label: '📝 Caption' },
+    { id: 'script', label: '🎬 Script' },
+    { id: 'hooks', label: '🪝 Hooks' },
+    { id: 'trending', label: '🔥 Trending' },
+    { id: 'timing', label: '⏰ Timing' },
+    { id: 'imagegen', label: '🎨 AI Image' },
+  ];
 
   return (
     <div className="generator-page">
@@ -121,66 +118,54 @@ const tabs = [
           <p className="generator-subtitle">Create AI-powered content for {platform}</p>
 
           <div className="mode-toggle">
-            <button
-              className={`mode-btn ${mode === 'text' ? 'active' : ''}`}
-              onClick={() => setMode('text')}
-            >
+            <button className={`mode-btn ${mode === 'text' ? 'active' : ''}`} onClick={() => setMode('text')}>
               ✏️ Text Topic
             </button>
-            <button
-              className={`mode-btn ${mode === 'image' ? 'active' : ''}`}
-              onClick={() => setMode('image')}
-            >
+            <button className={`mode-btn ${mode === 'image' ? 'active' : ''}`} onClick={() => setMode('image')}>
               🖼️ Upload Image
             </button>
           </div>
 
-          {mode === 'image' ? (
-  <div>
-    <div className="form-group">
-      <label>Upload Image</label>
-      <div className="image-upload-area" onClick={() => document.getElementById('imageInput').click()}>
-        {imagePreview ? (
-          <img src={imagePreview} alt="preview" className="image-preview" />
-        ) : (
-          <div className="upload-placeholder">
-            <span>🖼️</span>
-            <p>Click to upload image</p>
-            <small>JPG, PNG supported</small>
-          </div>
-        )}
-      </div>
-      <input
-        id="imageInput"
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        style={{ display: 'none' }}
-      />
-    </div>
-
-    <div className="form-group">
-      <label>Describe your image or add extra instructions</label>
-      <textarea
-        placeholder="e.g. This is a photo of my new cafe interior, focus on the cozy atmosphere and wooden decor..."
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
-        rows={3}
-      />
-    </div>
-  </div>
-) : (
-  <div className="form-group">
-    <label>Topic / Keywords</label>
-    <textarea
-      placeholder={`e.g. Launching a new product on ${platform}...`}
-      value={topic}
-      onChange={(e) => setTopic(e.target.value)}
-      rows={4}
-      required
-    />
-  </div>
-)}
+          <form onSubmit={handleGenerate} className="generator-form">
+            {mode === 'image' ? (
+              <div>
+                <div className="form-group">
+                  <label>Upload Image</label>
+                  <div className="image-upload-area" onClick={() => document.getElementById('imageInput').click()}>
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="preview" className="image-preview" />
+                    ) : (
+                      <div className="upload-placeholder">
+                        <span>🖼️</span>
+                        <p>Click to upload image</p>
+                        <small>JPG, PNG supported</small>
+                      </div>
+                    )}
+                  </div>
+                  <input id="imageInput" type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                </div>
+                <div className="form-group">
+                  <label>Describe your image or add extra instructions</label>
+                  <textarea
+                    placeholder="e.g. This is a photo of my new cafe interior, focus on the cozy atmosphere..."
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="form-group">
+                <label>Topic / Keywords</label>
+                <textarea
+                  placeholder={`e.g. Launching a new product on ${platform}...`}
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  rows={4}
+                  required
+                />
+              </div>
+            )}
 
             <div className="form-group">
               <label>Tone</label>
@@ -236,6 +221,7 @@ const tabs = [
               </div>
 
               <div className="result-content">
+
                 {activeTab === 'caption' && (
                   <div>
                     {result.imageDescription && (
@@ -244,50 +230,6 @@ const tabs = [
                         <p className="result-text">{result.imageDescription}</p>
                       </div>
                     )}
-                    {activeTab === 'imagegen' && (
-              <div className="imagegen-section">
-                <div className="result-section">
-                  <label>🎨 AI Image Generator</label>
-                  <p className="imagegen-hint">
-                    Generate a custom image based on your content topic for {platform}
-                  </p>
-                </div>
-
-                <div className="imagegen-prompt">
-                  <p className="prompt-preview">
-                    Prompt: <span>{topic}, {platform} post, {tone} style</span>
-                  </p>
-                </div>
-
-                <button
-                  className="generate-btn"
-                  onClick={handleImageGenerate}
-                  disabled={imageGenLoading}
-                  style={{ marginBottom: '1rem' }}
-                >
-                  {imageGenLoading ? '⏳ Generating Image...' : '🎨 Generate Image'}
-                </button>
-
-                {imageGenError && <div className="gen-error">{imageGenError}</div>}
-
-                {imageGenLoading && (
-                  <div className="imagegen-loading">
-                    <div className="spinner"></div>
-                    <p>AI is creating your image...</p>
-                    <small>This may take 20-30 seconds</small>
-                  </div>
-                )}
-
-                {generatedImage && (
-                  <div className="imagegen-result">
-                    <img src={generatedImage} alt="AI Generated" className="generated-image" />
-                    <a href={generatedImage} download="socialgenai-image.png" className="action-btn primary" style={{ display: 'block', textAlign: 'center', marginTop: '1rem', textDecoration: 'none', padding: '0.75rem', borderRadius: '8px' }}>
-                      ⬇️ Download Image
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
                     <div className="result-section">
                       <label>📝 Caption</label>
                       <p className="result-text">{result.caption}</p>
@@ -309,7 +251,7 @@ const tabs = [
 
                 {activeTab === 'script' && (
                   <div className="result-section">
-                    <label>🎬 Video Script (30-60 sec)</label>
+                    <label>🎬 Video Script</label>
                     <p className="result-text script-text">{result.script}</p>
                   </div>
                 )}
@@ -353,23 +295,55 @@ const tabs = [
                 )}
 
                 {activeTab === 'timing' && result.postingTime && (
-                  <div>
-                    <div className="timing-card">
-                      <div className="timing-item">
-                        <span className="timing-label">⏰ Best Time to Post</span>
-                        <span className="timing-value">{result.postingTime.best}</span>
-                      </div>
-                      <div className="timing-item">
-                        <span className="timing-label">📈 Peak Traffic Time</span>
-                        <span className="timing-value">{result.postingTime.peak}</span>
-                      </div>
-                      <div className="timing-item">
-                        <span className="timing-label">📅 Highest Traffic Days</span>
-                        <span className="timing-value">{result.postingTime.traffic}</span>
-                      </div>
+                  <div className="timing-card">
+                    <div className="timing-item">
+                      <span className="timing-label">⏰ Best Time to Post</span>
+                      <span className="timing-value">{result.postingTime.best}</span>
+                    </div>
+                    <div className="timing-item">
+                      <span className="timing-label">📈 Peak Traffic Time</span>
+                      <span className="timing-value">{result.postingTime.peak}</span>
+                    </div>
+                    <div className="timing-item">
+                      <span className="timing-label">📅 Highest Traffic Days</span>
+                      <span className="timing-value">{result.postingTime.traffic}</span>
                     </div>
                   </div>
                 )}
+
+                {activeTab === 'imagegen' && (
+                  <div className="imagegen-section">
+                    <div className="result-section">
+                      <label>🎨 AI Image Generator</label>
+                      <p className="imagegen-hint">Generate a custom image based on your content topic for {platform}</p>
+                    </div>
+                    <div className="imagegen-prompt">
+                      <p className="prompt-preview">
+                        Prompt: <span>{topic}, {platform} post, {tone} style</span>
+                      </p>
+                    </div>
+                    <button className="generate-btn" onClick={handleImageGenerate} disabled={imageGenLoading} style={{ marginBottom: '1rem' }}>
+                      {imageGenLoading ? '⏳ Generating Image...' : '🎨 Generate Image'}
+                    </button>
+                    {imageGenError && <div className="gen-error">{imageGenError}</div>}
+                    {imageGenLoading && (
+                      <div className="imagegen-loading">
+                        <div className="spinner"></div>
+                        <p>AI is creating your image...</p>
+                        <small>This may take 20-30 seconds</small>
+                      </div>
+                    )}
+                    {generatedImage && (
+                      <div className="imagegen-result">
+                        <img src={generatedImage} alt="AI Generated" className="generated-image" />
+                        <a href={generatedImage} download="socialgenai-image.png" className="action-btn primary" style={{ display: 'block', textAlign: 'center', marginTop: '1rem', textDecoration: 'none', padding: '0.75rem', borderRadius: '8px' }}>
+                          ⬇️ Download Image
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
               </div>
 
               <div className="result-actions">
