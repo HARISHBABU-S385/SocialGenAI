@@ -16,54 +16,72 @@ const postingTimes = {
   Facebook: { best: '1 PM - 4 PM', peak: '3 PM', traffic: 'Highest on Thu & Fri' }
 };
 
+// --- MAIN GENERATE ROUTE ---
 router.post('/', auth, async (req, res) => {
   try {
     const { topic, platform, tone } = req.body;
 
+    // === NEW UPGRADED PROMPT STARTS HERE ===
     const prompt = `
-You are a world-class social media strategist, viral content expert, and professional copywriter with 10+ years of experience growing brands on ${platform}.
+You are a viral social media content creator who has grown multiple accounts to over 1 million followers. You write content that feels 100% human, relatable, and emotionally engaging. You never sound robotic or AI-generated.
 
-Generate EXTREMELY detailed, creative, and high-quality social media content for:
+Create highly engaging social media content for:
 - Topic: ${topic}
 - Platform: ${platform}
 - Tone: ${tone}
 
+STRICT RULES:
+- Write like a real human being, not an AI
+- Use natural language, slang, and conversational style
+- Add personality, emotion, and storytelling
+- Never use corporate buzzwords like "delve", "leverage", "utilize"
+- Make people stop scrolling and actually read
+- Write for real people not for algorithms
+
 Respond ONLY in this exact JSON format with no extra text:
 {
-  "caption": "Write a long, powerful, emotionally engaging caption (minimum 5-7 sentences). Use storytelling, emojis, line breaks shown as \\n, and a strong narrative that connects with the audience deeply. Make it platform-optimized for ${platform}.",
-  "hashtags": ["hashtag1", "hashtag2", "hashtag3", "hashtag4", "hashtag5", "hashtag6", "hashtag7", "hashtag8", "hashtag9", "hashtag10"],
-  "callToAction": "Write a compelling, creative and urgent call to action that makes people want to act immediately. Make it specific and exciting, not generic.",
+  Caption instruction:
+"caption": "Write like a real shop owner texting their friend about this exciting news. No corporate words. Short sentences. Real emotions. Start with something unexpected, not 'Hey everyone'. Use \\n between thoughts. Sound excited but natural."
+  "hashtags": ["mix of niche hashtags", "trending hashtags", "branded hashtags", "community hashtags", "discovery hashtags", "viral hashtags", "location based if relevant", "topic specific", "audience specific", "platform specific"],
+  
+  "callToAction": "Write a CTA that feels like a friend asking a genuine question or making an exciting offer. Make it conversational and specific, not generic like 'click the link in bio'.",
+  
   "postIdeas": [
-    "Detailed creative post idea 1 with full explanation of concept, visual description and why it will go viral",
-    "Detailed creative post idea 2 with full explanation",
-    "Detailed creative post idea 3 with full explanation",
-    "Detailed creative post idea 4 with full explanation",
-    "Detailed creative post idea 5 with full explanation"
+    "Post idea 1: Give a specific, creative, detailed content concept with exact execution steps, what to film/photograph, what to say, and why this specific format will go viral on ${platform}",
+    "Post idea 2: Another unique angle with full execution details",
+    "Post idea 3: A trending format adapted to this topic with step by step guide",
+    "Post idea 4: A controversial or surprising take that will spark comments and shares",
+    "Post idea 5: A personal story format that makes the audience feel deeply connected"
   ],
-  "script": "Write a complete, detailed 60-90 second video script with:\\n\\nHOOK (0-5 sec): An attention-grabbing opening line that stops the scroll\\n\\nINTRO (5-15 sec): Introduce the topic with energy and excitement\\n\\nMAIN CONTENT (15-50 sec): Deliver 3-4 key points with examples, stories or facts\\n\\nCTA (50-60 sec): Strong closing with clear next steps\\n\\nMake it natural, conversational and engaging for ${platform}.",
+  
+  "script": "Write exactly what a real person would say on camera — nervous energy, natural pauses, genuine excitement. No 'Hey everyone welcome back'. Start mid-thought like you're already in a conversation. Include specific real details like prices, location, personal story of why this shop was started. Write every single word to be spoken. Minimum 400 words. No section labels like HOOK or INTRO in the final output."
   "hooks": [
-    "Viral hook 1 - a scroll-stopping opening line using curiosity or shock",
-    "Viral hook 2 - a hook using a bold controversial statement or surprising fact",
-    "Viral hook 3 - a hook using a relatable pain point or emotion",
-    "Viral hook 4 - a hook using a strong question that demands attention",
-    "Viral hook 5 - a hook using a story or personal experience angle"
+    "A hook using a shocking statistic or fact nobody knows about ${topic}",
+    "A hook using a deeply relatable pain point or frustration",
+    "A hook starting with 'Nobody talks about...' or 'I wish someone told me...'",
+    "A hook using a controversial opinion that sparks debate",
+    "A hook using a personal failure or vulnerable moment related to ${topic}"
   ],
-  "nicheOfDay": "Specific niche category with sub-niche (e.g. Food & Lifestyle > Street Food Culture)",
+  
+  "nicheOfDay": "Specific niche with sub-niche and brief explanation of why this niche is trending today (e.g. Food & Lifestyle > South Indian Street Food — trending because of recent viral reels showing authentic local experiences)",
+  
   "trendingTopics": [
-    "Trending topic 1 with explanation of why it is trending right now",
-    "Trending topic 2 with explanation",
-    "Trending topic 3 with explanation",
-    "Trending topic 4 with explanation",
-    "Trending topic 5 with explanation"
+    "Trending topic 1 related to ${topic} — explain the trend, why it is viral right now, and how to ride this trend",
+    "Trending topic 2 — with specific content angle to take advantage of it",
+    "Trending topic 3 — with example of what type of post would go viral",
+    "Trending topic 4 — with the emotion it triggers and why people share it",
+    "Trending topic 5 — with the best format (reel, carousel, story, thread) to use"
   ],
+  
   "viralSuggestions": [
-    "Detailed viral content strategy 1 - explain the format, why it works, and how to execute it perfectly on ${platform}",
-    "Detailed viral content strategy 2 - with execution tips",
-    "Detailed viral content strategy 3 - with execution tips",
-    "Detailed viral content strategy 4 - with execution tips"
+    "Viral strategy 1: Describe the exact content format, why it works psychologically, step by step execution guide, and what result to expect on ${platform}",
+    "Viral strategy 2: A collaboration or duet idea that doubles reach with full execution plan",
+    "Viral strategy 3: A series concept that builds a loyal audience over time with content calendar outline",
+    "Viral strategy 4: A controversial or emotional angle that triggers comments and shares with safety tips to avoid backlash"
   ]
 }
 `;
+    // === NEW UPGRADED PROMPT ENDS HERE ===
 
     const completion = await groq.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
@@ -100,6 +118,7 @@ Respond ONLY in this exact JSON format with no extra text:
   }
 });
 
+// --- IMAGE GENERATE ROUTE ---
 router.post('/image', auth, upload.single('image'), async (req, res) => {
   try {
     const { platform, tone } = req.body;
