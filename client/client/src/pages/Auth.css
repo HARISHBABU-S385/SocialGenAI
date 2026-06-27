@@ -313,3 +313,35 @@
   .form-box { width: 100%; position: relative; }
   .toggle-box { display: none; }
 }
+.forgot-link {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #4a6a8a;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.forgot-link:hover { color: #4da6ff; }
+
+.forgot-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.forgot-box {
+  background: #0d1526;
+  border: 1px solid rgba(77,166,255,0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.forgot-box h3 { color: #4da6ff; margin-bottom: 1.5rem; font-weight: 500; }
+.forgot-msg { color: #4da6ff; font-size: 0.85rem; margin-bottom: 0.5rem; text-align: center; }

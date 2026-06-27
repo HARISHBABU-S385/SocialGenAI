@@ -49,6 +49,25 @@ const Auth = () => {
       setRegisterError(err.response?.data?.message || 'Registration failed');
     }
     setLoading(false);
+    const [showForgot, setShowForgot] = useState(false);
+const [forgotEmail, setForgotEmail] = useState('');
+const [forgotPassword, setForgotPassword] = useState('');
+const [forgotMsg, setForgotMsg] = useState('');
+const handleForgot = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await fetch('https://socialgenai-backend.onrender.com/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: forgotEmail, newPassword: forgotPassword })
+    });
+    const data = await res.json();
+    if (res.ok) setForgotMsg('Password updated! Please login.');
+    else setForgotMsg(data.message);
+  } catch (err) {
+    setForgotMsg('Failed. Try again.');
+  }
+};
   };
 
   return (
@@ -109,6 +128,30 @@ const Auth = () => {
                 required
               />
             </div>
+            {showForgot && (
+  <div className="forgot-overlay">
+    <div className="forgot-box">
+      <h3>Reset Password</h3>
+      <form onSubmit={handleForgot}>
+        <div className="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Your email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required />
+        </div>
+        <div className="form-group">
+          <label>New Password</label>
+          <input type="password" placeholder="New password" value={forgotPassword} onChange={(e) => setForgotPassword(e.target.value)} required />
+        </div>
+        {forgotMsg && <p className="forgot-msg">{forgotMsg}</p>}
+        <button type="submit" className="auth-btn">Update Password</button>
+        <button type="button" className="auth-btn" style={{background:'transparent', border:'1px solid rgba(77,166,255,0.2)', marginTop:'0.5rem'}} onClick={() => setShowForgot(false)}>Cancel</button>
+      </form>
+    </div>
+  </div>
+)}
+<p className="forgot-link" onClick={() => setShowForgot(true)}>
+  Forgot password?
+</p>
+
             <div className="form-group">
               <label>Email</label>
               <input
@@ -151,13 +194,13 @@ const Auth = () => {
             </button>
           </div>
           <div className="toggle-panel toggle-right">
-            <div className="brand-logo">⚡ SocialGenAI</div>
-            <h1>Join SocialGenAI</h1>
-            <p>Create stunning content with AI in seconds</p>
-            <button className="toggle-btn" onClick={() => setIsActive(false)}>
-              Login
-            </button>
-          </div>
+  <div className="brand-logo">⚡ SocialGenAI</div>
+  <h1>Join SocialGenAI</h1>
+  <p>Create stunning content with AI in seconds</p>
+  <button className="toggle-btn" onClick={() => setIsActive(true)}>
+    Register
+  </button>
+</div>
         </div>
 
       </div>
