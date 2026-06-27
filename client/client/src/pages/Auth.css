@@ -59,9 +59,7 @@
 }
 
 @keyframes containerFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-6px) rotate(0.3deg); }
-  66% { transform: translateY(-3px) rotate(-0.2deg); }
+  0%, 100% { transform: translateY(0); }
 }
 
 /* FORM BOXES */
@@ -345,3 +343,4 @@
 
 .forgot-box h3 { color: #4da6ff; margin-bottom: 1.5rem; font-weight: 500; }
 .forgot-msg { color: #4da6ff; font-size: 0.85rem; margin-bottom: 0.5rem; text-align: center; }
+
