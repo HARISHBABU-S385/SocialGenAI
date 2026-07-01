@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getPosts, deletePost } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './History.css';
-import PageTransition from '../components/PageTransition';
 
 const History = () => {
   const { user, logout } = useAuth();
@@ -34,8 +33,6 @@ const History = () => {
   const filtered = filter === 'saved' ? posts.filter(p => p.isSaved) : posts;
 
   return (
-    
-    <PageTransition>
     <div className="history-page">
       <nav className="navbar">
         <span className="navbar-brand">⚡ SocialGenAI</span>
@@ -110,12 +107,18 @@ const History = () => {
               </div>
 
               <h2 className="detail-topic">{selectedPost.topic}</h2>
-     {selectedPost.imageUrl && (
-  <div className="detail-section">
-    <label>🎨 Saved Image</label>
-    <img src={selectedPost.imageUrl} alt="saved" style={{width:'100%', borderRadius:'10px'}} />
-  </div>
-)}         
+
+              {selectedPost.imageUrl && (
+                <div className="detail-section">
+                  <label>🎨 Saved Image</label>
+                  <img src={selectedPost.imageUrl} alt="saved" style={{width:'100%', borderRadius:'10px', marginTop:'0.5rem'}} />
+                </div>
+              )}
+
+              {selectedPost.nicheOfDay && (
+                <div className="niche-badge" style={{marginBottom:'1rem'}}>🎯 Niche: {selectedPost.nicheOfDay}</div>
+              )}
+
               <div className="detail-section">
                 <label>📝 Caption</label>
                 <p className="detail-text">{selectedPost.caption}</p>
@@ -124,7 +127,7 @@ const History = () => {
               <div className="detail-section">
                 <label>🏷️ Hashtags</label>
                 <div className="hashtag-list">
-                  {selectedPost.hashtags.map((tag, i) => (
+                  {selectedPost.hashtags?.map((tag, i) => (
                     <span key={i} className="hashtag">#{tag}</span>
                   ))}
                 </div>
@@ -135,31 +138,101 @@ const History = () => {
                 <p className="detail-cta">{selectedPost.callToAction}</p>
               </div>
 
-              <div className="detail-section">
-                <label>💡 Post Ideas</label>
-                <ul className="ideas-list">
-                  {selectedPost.postIdeas?.map((idea, i) => (
-                    <li key={i}>{idea}</li>
+              {selectedPost.postIdeas?.length > 0 && (
+                <div className="detail-section">
+                  <label>💡 Post Ideas</label>
+                  <ul className="ideas-list">
+                    {selectedPost.postIdeas.map((idea, i) => (
+                      <li key={i}>{idea}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedPost.script && (
+                <div className="detail-section">
+                  <label>🎬 Video Script</label>
+                  <p className="detail-text">{selectedPost.script}</p>
+                </div>
+              )}
+
+              {selectedPost.hooks?.length > 0 && (
+                <div className="detail-section">
+                  <label>🪝 Trending Hooks</label>
+                  {selectedPost.hooks.map((hook, i) => (
+                    <div key={i} className="hook-item">{hook}</div>
                   ))}
-                </ul>
-              </div>
+                </div>
+              )}
+
+              {selectedPost.trendingTopics?.length > 0 && (
+                <div className="detail-section">
+                  <label>🔥 Trending Topics</label>
+                  {selectedPost.trendingTopics.map((topic, i) => (
+                    <div key={i} className="trending-item">#{topic}</div>
+                  ))}
+                </div>
+              )}
+
+              {selectedPost.viralSuggestions?.length > 0 && (
+                <div className="detail-section">
+                  <label>🚀 Viral Suggestions</label>
+                  {selectedPost.viralSuggestions.map((idea, i) => (
+                    <div key={i} className="viral-item">
+                      <span className="viral-dot"></span>{idea}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="detail-actions">
                 <button className="action-btn" onClick={() => {
-                  navigator.clipboard.writeText(`${selectedPost.caption}\n\n${selectedPost.hashtags.map(h => `#${h}`).join(' ')}\n\n${selectedPost.callToAction}`);
-                }}>
-                  📋 Copy
-                </button>
+                  navigator.clipboard.writeText(`${selectedPost.caption}\n\n${selectedPost.hashtags?.map(h => `#${h}`).join(' ')}\n\n${selectedPost.callToAction}`);
+                }}>📋 Copy</button>
                 <button className="action-btn primary" onClick={() => navigate(`/generate/${selectedPost.platform}`)}>
                   ✨ Generate Similar
                 </button>
               </div>
             </div>
           )}
+          {selectedPost.script && (
+  <div className="detail-section">
+    <label>🎬 Script</label>
+    <p className="detail-text">{selectedPost.script}</p>
+  </div>
+)}
+
+{selectedPost.hooks?.length > 0 && (
+  <div className="detail-section">
+    <label>🪝 Hooks</label>
+    {selectedPost.hooks.map((hook, i) => (
+      <div key={i} className="hook-item">{hook}</div>
+    ))}
+  </div>
+)}
+
+{selectedPost.trendingTopics?.length > 0 && (
+  <div className="detail-section">
+    <label>🔥 Trending Topics</label>
+    {selectedPost.trendingTopics.map((topic, i) => (
+      <div key={i} className="trending-item">#{topic}</div>
+    ))}
+  </div>
+)}
+
+{selectedPost.viralSuggestions?.length > 0 && (
+  <div className="detail-section">
+    <label>🚀 Viral Suggestions</label>
+    {selectedPost.viralSuggestions.map((idea, i) => (
+      <div key={i} className="viral-item">
+        <span className="viral-dot"></span>{idea}
+      </div>
+    ))}
+  </div>
+)}
         </div>
       </div>
     </div>
-    </PageTransition>
   );
 };
 

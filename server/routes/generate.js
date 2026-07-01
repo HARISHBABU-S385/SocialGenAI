@@ -85,20 +85,20 @@ Respond ONLY in this exact JSON format with no extra text:
     const timing = postingTimes[platform] || postingTimes['Instagram'];
 
     const post = new Post({
-      userId: req.user.id,
-      topic,
-      platform,
-      tone,
-      caption: generated.caption,
-      hashtags: generated.hashtags,
-      callToAction: generated.callToAction,
-      postIdeas: generated.postIdeas,
-      script: generated.script || '',
-      hooks: generated.hooks || [],
-      trendingTopics: generated.trendingTopics || [],
-      viralSuggestions: generated.viralSuggestions || [],
-      nicheOfDay: generated.nicheOfDay || ''
-    });
+  userId: req.user.id,
+  topic,
+  platform,
+  tone,
+  caption: generated.caption,
+  hashtags: generated.hashtags,
+  callToAction: generated.callToAction,
+  postIdeas: generated.postIdeas,
+  script: generated.script || '',
+  hooks: generated.hooks || [],
+  nicheOfDay: generated.nicheOfDay || '',
+  trendingTopics: generated.trendingTopics || [],
+  viralSuggestions: generated.viralSuggestions || []
+});
 
     await post.save();
 
