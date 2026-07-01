@@ -108,26 +108,26 @@ const History = () => {
 
               <h2 className="detail-topic">{selectedPost.topic}</h2>
 
-              {selectedPost.imageUrl && (
+              {selectedPost?.imageUrl && (
                 <div className="detail-section">
                   <label>🎨 Saved Image</label>
                   <img src={selectedPost.imageUrl} alt="saved" style={{width:'100%', borderRadius:'10px', marginTop:'0.5rem'}} />
                 </div>
               )}
 
-              {selectedPost.nicheOfDay && (
+              {selectedPost?.nicheOfDay && (
                 <div className="niche-badge" style={{marginBottom:'1rem'}}>🎯 Niche: {selectedPost.nicheOfDay}</div>
               )}
 
               <div className="detail-section">
                 <label>📝 Caption</label>
-                <p className="detail-text">{selectedPost.caption}</p>
+                <p className="detail-text">{selectedPost?.caption}</p>
               </div>
 
               <div className="detail-section">
                 <label>🏷️ Hashtags</label>
                 <div className="hashtag-list">
-                  {selectedPost.hashtags?.map((tag, i) => (
+                  {selectedPost?.hashtags?.map((tag, i) => (
                     <span key={i} className="hashtag">#{tag}</span>
                   ))}
                 </div>
@@ -135,10 +135,10 @@ const History = () => {
 
               <div className="detail-section">
                 <label>📣 Call to Action</label>
-                <p className="detail-cta">{selectedPost.callToAction}</p>
+                <p className="detail-cta">{selectedPost?.callToAction}</p>
               </div>
 
-              {selectedPost.postIdeas?.length > 0 && (
+              {selectedPost?.postIdeas?.length > 0 && (
                 <div className="detail-section">
                   <label>💡 Post Ideas</label>
                   <ul className="ideas-list">
@@ -149,14 +149,14 @@ const History = () => {
                 </div>
               )}
 
-              {selectedPost.script && (
+              {selectedPost?.script && (
                 <div className="detail-section">
                   <label>🎬 Video Script</label>
                   <p className="detail-text">{selectedPost.script}</p>
                 </div>
               )}
 
-              {selectedPost.hooks?.length > 0 && (
+              {selectedPost?.hooks?.length > 0 && (
                 <div className="detail-section">
                   <label>🪝 Trending Hooks</label>
                   {selectedPost.hooks.map((hook, i) => (
@@ -165,7 +165,7 @@ const History = () => {
                 </div>
               )}
 
-              {selectedPost.trendingTopics?.length > 0 && (
+              {selectedPost?.trendingTopics?.length > 0 && (
                 <div className="detail-section">
                   <label>🔥 Trending Topics</label>
                   {selectedPost.trendingTopics.map((topic, i) => (
@@ -174,7 +174,7 @@ const History = () => {
                 </div>
               )}
 
-              {selectedPost.viralSuggestions?.length > 0 && (
+              {selectedPost?.viralSuggestions?.length > 0 && (
                 <div className="detail-section">
                   <label>🚀 Viral Suggestions</label>
                   {selectedPost.viralSuggestions.map((idea, i) => (
@@ -187,49 +187,14 @@ const History = () => {
 
               <div className="detail-actions">
                 <button className="action-btn" onClick={() => {
-                  navigator.clipboard.writeText(`${selectedPost.caption}\n\n${selectedPost.hashtags?.map(h => `#${h}`).join(' ')}\n\n${selectedPost.callToAction}`);
+                  navigator.clipboard.writeText(`${selectedPost?.caption}\n\n${selectedPost?.hashtags?.map(h => `#${h}`).join(' ')}\n\n${selectedPost?.callToAction}`);
                 }}>📋 Copy</button>
-                <button className="action-btn primary" onClick={() => navigate(`/generate/${selectedPost.platform}`)}>
+                <button className="action-btn primary" onClick={() => navigate(`/generate/${selectedPost?.platform}`)}>
                   ✨ Generate Similar
                 </button>
               </div>
             </div>
           )}
-          {selectedPost.script && (
-  <div className="detail-section">
-    <label>🎬 Script</label>
-    <p className="detail-text">{selectedPost.script}</p>
-  </div>
-)}
-
-{selectedPost.hooks?.length > 0 && (
-  <div className="detail-section">
-    <label>🪝 Hooks</label>
-    {selectedPost.hooks.map((hook, i) => (
-      <div key={i} className="hook-item">{hook}</div>
-    ))}
-  </div>
-)}
-
-{selectedPost.trendingTopics?.length > 0 && (
-  <div className="detail-section">
-    <label>🔥 Trending Topics</label>
-    {selectedPost.trendingTopics.map((topic, i) => (
-      <div key={i} className="trending-item">#{topic}</div>
-    ))}
-  </div>
-)}
-
-{selectedPost.viralSuggestions?.length > 0 && (
-  <div className="detail-section">
-    <label>🚀 Viral Suggestions</label>
-    {selectedPost.viralSuggestions.map((idea, i) => (
-      <div key={i} className="viral-item">
-        <span className="viral-dot"></span>{idea}
-      </div>
-    ))}
-  </div>
-)}
         </div>
       </div>
     </div>
