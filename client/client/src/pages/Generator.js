@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { generatePost, generateFromImage, savePost, generateImage } from '../services/api';
+import { generatePost, generateFromImage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Generator.css';
-import PageTransition from '../components/PageTransition';
 
 const Generator = () => {
   const { user, logout } = useAuth();
@@ -17,12 +16,6 @@ const Generator = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [saved, setSaved] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState('caption');
-  const [generatedImage, setGeneratedImage] = useState(null);
-  const [imageGenLoading, setImageGenLoading] = useState(false);
-  const [imageGenError, setImageGenError] = useState('');
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -32,76 +25,36 @@ const Generator = () => {
     }
   };
 
- const handleGenerate = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
-  try {
-    let res;
-    if (mode === 'image' && image) {
-      const formData = new FormData();
-      formData.append('image', image);
-      formData.append('platform', platform);
-      formData.append('tone', tone);
-      formData.append('topic', topic);
-      res = await generateFromImage(formData);
-    } else {
-      res = await generatePost({ topic, platform, tone });
-    }
-    navigate('/result', {
-      state: {
-        result: res.data.data,
-        postId: res.data.postId,
-        platform
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      let res;
+      if (mode === 'image' && image) {
+        const formData = new FormData();
+        formData.append('image', image);
+        formData.append('platform', platform);
+        formData.append('tone', tone);
+        formData.append('topic', topic);
+        res = await generateFromImage(formData);
+      } else {
+        res = await generatePost({ topic, platform, tone });
       }
-    });
-  } catch (err) {
-    setError('Generation failed. Please try again.');
-  }
-  setLoading(false);
-};
-
-  const handleSave = async () => {
-    try {
-      await savePost(postId);
-      setSaved(true);
+      navigate('/result', {
+        state: {
+          result: res.data.data,
+          postId: res.data.postId,
+          platform
+        }
+      });
     } catch (err) {
-      setError('Failed to save post.');
+      setError('Generation failed. Please try again.');
     }
+    setLoading(false);
   };
-
-  const handleCopy = () => {
-    const text = `${result.caption}\n\n${result.hashtags.map(h => `#${h}`).join(' ')}\n\n${result.callToAction}`;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleImageGenerate = async () => {
-    setImageGenLoading(true);
-    setImageGenError('');
-    setGeneratedImage(null);
-    try {
-      const imagePrompt = `${topic}, ${platform} post, ${tone} style, high quality, professional photography`;
-      const res = await generateImage({ prompt: imagePrompt });
-      setGeneratedImage(res.data.image);
-    } catch (err) {
-      setImageGenError('Image generation failed. Try again.');
-    }
-    setImageGenLoading(false);
-  };
-
-  const tabs = [
-    { id: 'caption', label: '📝 Caption' },
-    { id: 'script', label: '🎬 Script' },
-    { id: 'hooks', label: '🪝 Hooks' },
-    { id: 'trending', label: '🔥 Trending' },
-    { id: 'timing', label: '⏰ Timing' },
-    { id: 'imagegen', label: '🎨 AI Image' },
-  ];
 
   return (
-    <PageTransition>
     <div className="generator-page">
       <nav className="navbar">
         <span className="navbar-brand">⚡ SocialGenAI</span>
@@ -189,10 +142,10 @@ const Generator = () => {
         </div>
 
         <div className="generator-right">
-          {!result && !loading && (
+          {!loading && (
             <div className="empty-state">
               <div className="empty-icon">✨</div>
-              <h3>Your content will appear here</h3>
+              <h3>Your content will appear on next page</h3>
               <p>Fill in the form and click Generate</p>
             </div>
           )}
@@ -203,165 +156,9 @@ const Generator = () => {
               <p>AI is crafting your content...</p>
             </div>
           )}
-
-          {result && (
-            <div className="result-wrapper">
-              {result.nicheOfDay && (
-                <div className="niche-badge">🎯 Niche of the Day: {result.nicheOfDay}</div>
-              )}
-
-              <div className="result-tabs">
-                {tabs.map(tab => (
-                  <button
-                    key={tab.id}
-                    className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                    onClick={() => setActiveTab(tab.id)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="result-content">
-
-                {activeTab === 'caption' && (
-                  <div>
-                    {result.imageDescription && (
-                      <div className="result-section">
-                        <label>🖼️ Image Description</label>
-                        <p className="result-text">{result.imageDescription}</p>
-                      </div>
-                    )}
-                    <div className="result-section">
-                      <label>📝 Caption</label>
-                      <p className="result-text">{result.caption}</p>
-                    </div>
-                    <div className="result-section">
-                      <label>🏷️ Hashtags</label>
-                      <div className="hashtag-list">
-                        {result.hashtags.map((tag, i) => (
-                          <span key={i} className="hashtag">#{tag}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="result-section">
-                      <label>📣 Call to Action</label>
-                      <p className="result-cta">{result.callToAction}</p>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'script' && (
-                  <div className="result-section">
-                    <label>🎬 Video Script</label>
-                    <p className="result-text script-text">{result.script}</p>
-                  </div>
-                )}
-
-                {activeTab === 'hooks' && (
-                  <div>
-                    <div className="result-section">
-                      <label>🪝 Trending Hooks</label>
-                      {result.hooks?.map((hook, i) => (
-                        <div key={i} className="hook-item">{hook}</div>
-                      ))}
-                    </div>
-                    <div className="result-section">
-                      <label>💡 Post Ideas</label>
-                      <ul className="ideas-list">
-                        {result.postIdeas?.map((idea, i) => (
-                          <li key={i}>{idea}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'trending' && (
-                  <div>
-                    <div className="result-section">
-                      <label>🔥 Trending Topics</label>
-                      {result.trendingTopics?.map((topic, i) => (
-                        <div key={i} className="trending-item">#{topic}</div>
-                      ))}
-                    </div>
-                    <div className="result-section">
-                      <label>🚀 Viral Suggestions</label>
-                      {result.viralSuggestions?.map((idea, i) => (
-                        <div key={i} className="viral-item">
-                          <span className="viral-dot"></span>{idea}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'timing' && result.postingTime && (
-                  <div className="timing-card">
-                    <div className="timing-item">
-                      <span className="timing-label">⏰ Best Time to Post</span>
-                      <span className="timing-value">{result.postingTime.best}</span>
-                    </div>
-                    <div className="timing-item">
-                      <span className="timing-label">📈 Peak Traffic Time</span>
-                      <span className="timing-value">{result.postingTime.peak}</span>
-                    </div>
-                    <div className="timing-item">
-                      <span className="timing-label">📅 Highest Traffic Days</span>
-                      <span className="timing-value">{result.postingTime.traffic}</span>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'imagegen' && (
-                  <div className="imagegen-section">
-                    <div className="result-section">
-                      <label>🎨 AI Image Generator</label>
-                      <p className="imagegen-hint">Generate a custom image based on your content topic for {platform}</p>
-                    </div>
-                    <div className="imagegen-prompt">
-                      <p className="prompt-preview">
-                        Prompt: <span>{topic}, {platform} post, {tone} style</span>
-                      </p>
-                    </div>
-                    <button className="generate-btn" onClick={handleImageGenerate} disabled={imageGenLoading} style={{ marginBottom: '1rem' }}>
-                      {imageGenLoading ? '⏳ Generating Image...' : '🎨 Generate Image'}
-                    </button>
-                    {imageGenError && <div className="gen-error">{imageGenError}</div>}
-                    {imageGenLoading && (
-                      <div className="imagegen-loading">
-                        <div className="spinner"></div>
-                        <p>AI is creating your image...</p>
-                        <small>This may take 20-30 seconds</small>
-                      </div>
-                    )}
-                    {generatedImage && (
-                      <div className="imagegen-result">
-                        <img src={generatedImage} alt="AI Generated" className="generated-image" />
-                        <a href={generatedImage} download="socialgenai-image.png" className="action-btn primary" style={{ display: 'block', textAlign: 'center', marginTop: '1rem', textDecoration: 'none', padding: '0.75rem', borderRadius: '8px' }}>
-                          ⬇️ Download Image
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-              </div>
-
-              <div className="result-actions">
-                <button className="action-btn" onClick={handleCopy}>
-                  {copied ? '✅ Copied!' : '📋 Copy'}
-                </button>
-                <button className="action-btn primary" onClick={handleSave} disabled={saved}>
-                  {saved ? '✅ Saved' : '💾 Save'}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
-     </PageTransition>
   );
 };
 
