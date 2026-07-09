@@ -15,8 +15,6 @@ const Generator = () => {
   const [tone, setTone] = useState('casual');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [result, setResult] = useState(null);
-  const [postId, setPostId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
