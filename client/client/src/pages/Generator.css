@@ -68,25 +68,27 @@
 .btn-outline:hover { background: rgba(77,166,255,0.1); }
 
 .generator-container {
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  height: calc(100vh - 60px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 2rem;
 }
 
 .generator-left {
-  padding: 2rem;
-  border-right: 1px solid rgba(77,166,255,0.08);
-  overflow-y: auto;
-  background: rgba(13,21,38,0.5);
+  width: 100%;
+  max-width: 560px;
+  padding: 2.5rem;
+  border: 1px solid rgba(77,166,255,0.1);
+  border-radius: 24px;
+  background: rgba(13,21,38,0.7);
   backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 }
 
 .generator-right {
-  padding: 2rem;
-  overflow-y: auto;
-  background: rgba(8,13,26,0.7);
+  display: none;
 }
-
 .platform-badge {
   display: inline-flex;
   align-items: center;
