@@ -17,6 +17,9 @@ const Generator = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+
+
+  
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
