@@ -4,7 +4,8 @@
   align-items: center;
   height: 100vh;
   font-size: 1.5rem;
-  color: #6c63ff;
+  color: #4da6ff;
+  font-family: 'Playfair Display', serif;
 }
 
 .navbar {

@@ -34,32 +34,34 @@ const Generator = () => {
     }
   };
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setResult(null);
-    setSaved(false);
-    setActiveTab('caption');
-    try {
-      let res;
-      if (mode === 'image' && image) {
-        const formData = new FormData();
-        formData.append('image', image);
-        formData.append('platform', platform);
-        formData.append('tone', tone);
-        formData.append('topic', topic);
-        res = await generateFromImage(formData);
-      } else {
-        res = await generatePost({ topic, platform, tone });
-      }
-      setResult(res.data.data);
-      setPostId(res.data.postId);
-    } catch (err) {
-      setError('Generation failed. Please try again.');
+ const handleGenerate = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  try {
+    let res;
+    if (mode === 'image' && image) {
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('platform', platform);
+      formData.append('tone', tone);
+      formData.append('topic', topic);
+      res = await generateFromImage(formData);
+    } else {
+      res = await generatePost({ topic, platform, tone });
     }
-    setLoading(false);
-  };
+    navigate('/result', {
+      state: {
+        result: res.data.data,
+        postId: res.data.postId,
+        platform
+      }
+    });
+  } catch (err) {
+    setError('Generation failed. Please try again.');
+  }
+  setLoading(false);
+};
 
   const handleSave = async () => {
     try {

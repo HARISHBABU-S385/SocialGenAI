@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import PlatformSelect from './pages/PlatformSelect';
 import Generator from './pages/Generator';
 import History from './pages/History';
+import Result from './pages/Result';
 import './App.css';
 import ImageGen from './pages/ImageGen';
 
@@ -24,6 +25,8 @@ function App() {
           <Route path="/generate/:platform" element={<PrivateRoute><Generator /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
           <Route path="/imagegenerate" element={<PrivateRoute><ImageGen /></PrivateRoute>} />
+          
+<Route path="/result" element={<PrivateRoute><Result /></PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
