@@ -39,7 +39,7 @@ Respond ONLY in this exact JSON format with no extra text:
 }`;
 
     const response = await cohere.chat({
-      model: 'command-r-plus',
+      gemini-promodel: 'command-a-03-2025',
       message: prompt,
       temperature: 0.7
     });
@@ -82,7 +82,7 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
 Respond ONLY in valid JSON with these keys: imageDescription, caption, hashtags, callToAction, postIdeas, script, hooks, nicheOfDay, trendingTopics, viralSuggestions.`;
 
     const response = await cohere.chat({
-      model: 'command-r-plus',
+      gemini-promodel: 'command-a-03-2025',
       message: prompt,
       temperature: 0.7
     });
