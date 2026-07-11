@@ -19,7 +19,7 @@ const postingTimes = {
 router.post('/', auth, async (req, res) => {
   try {
     const { topic, platform, tone } = req.body;
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const prompt = `You are a viral social media content creator. Create highly engaging content for:
 - Topic: ${topic}
@@ -74,7 +74,7 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
 
     if (!imageFile) return res.status(400).json({ message: 'No image uploaded' });
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const prompt = `Analyze this image and create ${platform} content in ${tone} tone. Respond ONLY in valid JSON with keys: imageDescription, caption, hashtags, callToAction, postIdeas, script, hooks, nicheOfDay, trendingTopics, viralSuggestions.`;
 
