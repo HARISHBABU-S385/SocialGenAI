@@ -4,19 +4,16 @@
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background: #050510;
-  color: #ffffff;
+  background: #f0ede6;
+  color: #1a1a1a;
   min-height: 100vh;
 }
 
-h1, h2, h3 {
-  font-family: 'Playfair Display', serif;
-}
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f0ede6; }
+::-webkit-scrollbar-thumb { background: #2d5a3d; border-radius: 10px; }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
