@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { CohereClient } = require('cohere-ai');
 const Post = require('../models/Post');
 const multer = require('multer');
 const fs = require('fs');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
 const upload = multer({ dest: 'uploads/' });
 
 const postingTimes = {
@@ -19,7 +19,6 @@ const postingTimes = {
 router.post('/', auth, async (req, res) => {
   try {
     const { topic, platform, tone } = req.body;
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const prompt = `You are a viral social media content creator. Create highly engaging content for:
 - Topic: ${topic}
@@ -28,19 +27,24 @@ router.post('/', auth, async (req, res) => {
 
 Respond ONLY in this exact JSON format with no extra text:
 {
-  "caption": "engaging caption",
-  "hashtags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "callToAction": "CTA",
-  "postIdeas": ["idea1", "idea2", "idea3"],
-  "script": "full video script minimum 200 words",
-  "hooks": ["hook1", "hook2", "hook3"],
-  "nicheOfDay": "niche category",
-  "trendingTopics": ["topic1", "topic2", "topic3"],
-  "viralSuggestions": ["strategy1", "strategy2", "strategy3"]
+  "caption": "engaging human-like caption minimum 5 sentences",
+  "hashtags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10"],
+  "callToAction": "compelling CTA",
+  "postIdeas": ["idea1", "idea2", "idea3", "idea4", "idea5"],
+  "script": "complete natural video script minimum 300 words",
+  "hooks": ["hook1", "hook2", "hook3", "hook4", "hook5"],
+  "nicheOfDay": "specific niche category",
+  "trendingTopics": ["topic1", "topic2", "topic3", "topic4", "topic5"],
+  "viralSuggestions": ["strategy1", "strategy2", "strategy3", "strategy4"]
 }`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await cohere.chat({
+      model: 'command-r-plus',
+      message: prompt,
+      temperature: 0.7
+    });
+
+    const text = response.text;
     const cleaned = text.replace(/```json|```/g, '').trim();
     const generated = JSON.parse(cleaned);
     const timing = postingTimes[platform] || postingTimes['Instagram'];
@@ -74,22 +78,20 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
 
     if (!imageFile) return res.status(400).json({ message: 'No image uploaded' });
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const prompt = `Create ${platform} social media content in ${tone} tone for this topic: ${topic || 'general lifestyle content'}.
+Respond ONLY in valid JSON with these keys: imageDescription, caption, hashtags, callToAction, postIdeas, script, hooks, nicheOfDay, trendingTopics, viralSuggestions.`;
 
-    const prompt = `Analyze this image and create ${platform} content in ${tone} tone. Respond ONLY in valid JSON with keys: imageDescription, caption, hashtags, callToAction, postIdeas, script, hooks, nicheOfDay, trendingTopics, viralSuggestions.`;
+    const response = await cohere.chat({
+      model: 'command-r-plus',
+      message: prompt,
+      temperature: 0.7
+    });
 
-    const imageData = {
-      inlineData: {
-        data: Buffer.from(fs.readFileSync(imageFile.path)).toString('base64'),
-        mimeType: imageFile.mimetype
-      }
-    };
-
-    const result = await model.generateContent([prompt, imageData]);
-    const text = result.response.text();
+    const text = response.text;
     const cleaned = text.replace(/```json|```/g, '').trim();
     const generated = JSON.parse(cleaned);
-    fs.unlinkSync(imageFile.path);
+
+    if (fs.existsSync(imageFile.path)) fs.unlinkSync(imageFile.path);
 
     const post = new Post({
       userId: req.user.id,
