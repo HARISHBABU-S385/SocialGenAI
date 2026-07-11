@@ -22,7 +22,7 @@ const Generator = () => {
 
     try {
       // Ensure this endpoint matches your backend route (e.g., /api/posts or /api/generate)
-      const response = await fetch('https://socialgenai-backend.onrender.com/api/posts', {
+      const response = await fetch('https://socialgenai-backend.onrender.com/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
