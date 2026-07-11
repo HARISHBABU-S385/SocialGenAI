@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenAI } = require('@google/genai');
 const Post = require('../models/Post');
 const multer = require('multer');
 const fs = require('fs');
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Initialize Gemini using your API Key
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const upload = multer({ dest: 'uploads/' });
 
 const postingTimes = {
@@ -16,6 +17,7 @@ const postingTimes = {
   Facebook: { best: '1 PM - 4 PM', peak: '3 PM', traffic: 'Highest on Thu & Fri' }
 };
 
+// 1. Text Content Generation Route
 router.post('/', auth, async (req, res) => {
   try {
     const { topic, platform, tone } = req.body;
@@ -69,15 +71,18 @@ Respond ONLY in this exact JSON format with no extra text outside the JSON:
   ]
 }`;
 
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }],
+    // Call Gemini 2.5 Flash
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        // Enforces JSON response format
+        responseMimeType: "application/json", 
+      }
     });
 
-    const text = message.content[0].text;
-    const cleaned = text.replace(/```json|```/g, '').trim();
-    const generated = JSON.parse(cleaned);
+    const text = response.text;
+    const generated = JSON.parse(text);
     const timing = postingTimes[platform] || postingTimes['Instagram'];
 
     const post = new Post({
@@ -109,6 +114,7 @@ Respond ONLY in this exact JSON format with no extra text outside the JSON:
   }
 });
 
+// 2. Image Upload & Content Generation Route
 router.post('/image', auth, upload.single('image'), async (req, res) => {
   try {
     const { platform, tone } = req.body;
@@ -116,33 +122,45 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
 
     if (!imageFile) return res.status(400).json({ message: 'No image uploaded' });
 
-    const prompt = `You are a viral social media content creator. A user uploaded an image described as: "${req.body.topic || 'no description provided'}". Create ${platform} content in ${tone} tone.
+    const prompt = `You are a viral social media content creator. Analyze the uploaded image and consider this user context if provided: "${req.body.topic || 'no description provided'}". Create ${platform} content in ${tone} tone based on what you see in the image.
 
 Respond ONLY in this exact JSON format:
 {
-  "imageDescription": "describe the image based on user description",
-  "caption": "engaging human caption",
+  "imageDescription": "Detailed visual description of the image",
+  "caption": "engaging human caption tailored to the image",
   "hashtags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10"],
   "callToAction": "natural conversational CTA",
   "postIdeas": ["idea 1", "idea 2", "idea 3"],
-  "script": "natural video script minimum 300 words",
+  "script": "natural video script minimum 300 words relating to the image",
   "hooks": ["hook 1", "hook 2", "hook 3"],
   "nicheOfDay": "relevant niche",
   "trendingTopics": ["topic 1", "topic 2", "topic 3"],
   "viralSuggestions": ["strategy 1", "strategy 2", "strategy 3"]
 }`;
 
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }],
+    // Convert the uploaded multer file to base64 for Gemini to read
+    const imageBase64 = Buffer.from(fs.readFileSync(imageFile.path)).toString("base64");
+    const imagePart = {
+      inlineData: {
+        data: imageBase64,
+        mimeType: imageFile.mimetype
+      }
+    };
+
+    // Pass BOTH the text prompt and the actual image to Gemini
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [prompt, imagePart],
+      config: {
+        responseMimeType: "application/json",
+      }
     });
 
-    const text = message.content[0].text;
-    const cleaned = text.replace(/```json|```/g, '').trim();
-    const generated = JSON.parse(cleaned);
+    const text = response.text;
+    const generated = JSON.parse(text);
     const timing = postingTimes[platform] || postingTimes['Instagram'];
 
+    // Clean up the uploaded file from the server
     fs.unlinkSync(imageFile.path);
 
     const post = new Post({
@@ -170,6 +188,10 @@ Respond ONLY in this exact JSON format:
     });
   } catch (err) {
     console.error('FULL ERROR:', err);
+    // Ensure file is deleted even if the API call fails
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     res.status(500).json({ message: err.message });
   }
 });

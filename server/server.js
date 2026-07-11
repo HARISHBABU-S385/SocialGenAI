@@ -26,3 +26,12 @@ mongoose.connect(process.env.MONGO_URI)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const cors = require('cors');
+
+// Replace this with your actual Vercel domain
+const corsOptions = {
+  origin: 'https://your-socialgenai-app.vercel.app',
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));

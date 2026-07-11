@@ -1,195 +1,117 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import PageTransition from '../components/PageTransition';
-import './ImageGen.css';
+import './ImageGen.css'; // Assuming you have a CSS file for styling
 
-const ImageGenerate = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [prompt, setPrompt] = useState('');
-  const [style, setStyle] = useState('photorealistic');
+const ImageGen = () => {
+  const [imagePrompt, setImagePrompt] = useState('');
+  const [generatedImageSrc, setGeneratedImageSrc] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [generatedImage, setGeneratedImage] = useState(null);
-  const [refPreview, setRefPreview] = useState(null);
-  const [saved, setSaved] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
 
-  const handleGenerate = async (e) => {
+  // 1. Handle Image Generation (Updated for Gemini base64 response)
+  const handleImageGenerate = async (e) => {
     e.preventDefault();
+    if (!imagePrompt.trim()) return;
+
     setLoading(true);
-    setError('');
-    setGeneratedImage(null);
-    setSaved(false);
+    setSaveStatus('');
+    setGeneratedImageSrc('');
+
     try {
-      let finalPrompt = prompt;
-      if (refPreview) {
-        finalPrompt = `recreate this image style: ${prompt}, same composition and mood`;
+      const response = await fetch('http://localhost:5000/api/imagegenerate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ prompt: imagePrompt })
+      });
+
+      const data = await response.json();
+      if (data.image) {
+        // Directly set the returned base64 string as the image source in your state
+        setGeneratedImageSrc(data.image); 
+      } else {
+        alert(data.message || 'Generation failed');
       }
-      finalPrompt += `, ${style} style, ultra realistic, high quality, professional, no watermark, no text`;
-      const encodedPrompt = encodeURIComponent(finalPrompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
-      setGeneratedImage(imageUrl);
-    } catch (err) {
-      setError('Image generation failed. Please try again.');
+    } catch (error) {
+      console.error("Error generating image:", error);
+      alert('An error occurred while generating the image.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleSave = async () => {
+  // 2. Handle Saving the Image to your History/Database
+  const handleSaveImage = async () => {
+    if (!generatedImageSrc) return;
+
     try {
-      const token = localStorage.getItem('token');
-      await fetch('https://socialgenai-backend.onrender.com/api/imagegenerate/save', {
+      const response = await fetch('http://localhost:5000/api/imagegenerate/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ imageUrl: generatedImage, prompt })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          imageUrl: generatedImageSrc, // Sends the base64 string to the database
+          prompt: imagePrompt
+        })
       });
-      setSaved(true);
-    } catch (err) {
-      setError('Save failed.');
+
+      const data = await response.json();
+      if (data.success) {
+        setSaveStatus('Image saved successfully!');
+      } else {
+        setSaveStatus('Failed to save image.');
+      }
+    } catch (error) {
+      console.error("Error saving image:", error);
+      setSaveStatus('Error saving image.');
     }
   };
 
   return (
-    <PageTransition>
-      <div className="imagegen-page">
-        <nav className="navbar">
-          <span className="navbar-brand">⚡ SocialGenAI</span>
-          <div className="navbar-links">
-            <span className="navbar-user">Hi, {user?.name}</span>
-            <button className="nav-link" onClick={() => navigate('/')}>Platforms</button>
-            <button className="nav-link" onClick={() => navigate('/history')}>History</button>
-            <button className="btn-outline" onClick={logout}>Logout</button>
+    <div className="image-gen-container">
+      <h2>AI Image Generator</h2>
+      
+      <form onSubmit={handleImageGenerate} className="prompt-form">
+        <textarea
+          value={imagePrompt}
+          onChange={(e) => setImagePrompt(e.target.value)}
+          placeholder="Describe the image you want to generate in detail (e.g., 'A futuristic city at sunset, cinematic lighting, 8k resolution')..."
+          rows="4"
+          disabled={loading}
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Generating Art...' : 'Generate Image'}
+        </button>
+      </form>
+
+      {/* Display Area */}
+      <div className="result-container">
+        {loading && (
+          <div className="loading-spinner">
+            <p>Creating your masterpiece with Gemini...</p>
           </div>
-        </nav>
+        )}
 
-        <div className="imagegen-container">
-          <div className="imagegen-left">
-            <div className="ig-badge">🎨 AI Image Generator</div>
-            <h1 className="ig-title">Create Stunning Images</h1>
-            <p className="ig-subtitle">Describe your vision or upload an image to recreate</p>
-
-            <form onSubmit={handleGenerate} className="ig-form">
-              <div className="ig-form-group">
-                <label>Describe your image</label>
-                <textarea
-                  placeholder="e.g. A cozy coffee shop at golden hour, warm lighting, cinematic look..."
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <div className="ig-form-group">
-                <label>Upload image to recreate (optional)</label>
-                <div
-                  className="ig-upload-area"
-                  onClick={() => document.getElementById('refImg').click()}
-                >
-                  {refPreview ? (
-                    <div className="ig-upload-preview">
-                      <img src={refPreview} alt="Reference" className="ig-ref-image" />
-                      <button
-                        type="button"
-                        className="ig-remove-btn"
-                        onClick={(e) => { e.stopPropagation(); setRefPreview(null); }}
-                      >
-                        ✕ Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="ig-upload-placeholder">
-                      <span>🖼️</span>
-                      <p>Click to upload reference image</p>
-                      <small>JPG, PNG supported</small>
-                    </div>
-                  )}
-                </div>
-                <input
-                  id="refImg"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) setRefPreview(URL.createObjectURL(file));
-                  }}
-                  style={{ display: 'none' }}
-                />
-              </div>
-
-              <div className="ig-form-group">
-                <label>Style</label>
-                <select value={style} onChange={(e) => setStyle(e.target.value)}>
-                  <option value="photorealistic">Photorealistic</option>
-                  <option value="digital art">Digital Art</option>
-                  <option value="cinematic">Cinematic</option>
-                  <option value="minimalist">Minimalist</option>
-                  <option value="watercolor">Watercolor</option>
-                  <option value="3D render">3D Render</option>
-                </select>
-              </div>
-
-              <button type="submit" className="ig-generate-btn" disabled={loading}>
-                {loading ? '⏳ Generating...' : '🎨 Generate Image'}
+        {generatedImageSrc && !loading && (
+          <div className="image-preview-box">
+            <h3>Your Generated Image</h3>
+            <img src={generatedImageSrc} alt="Generated AI Output" className="generated-image" />
+            
+            <div className="action-buttons">
+              <button onClick={handleSaveImage} className="save-btn">
+                Save to Dashboard
               </button>
-            </form>
-
-            {error && <div className="ig-error">{error}</div>}
+            </div>
+            
+            {saveStatus && <p className="status-message">{saveStatus}</p>}
           </div>
-
-          <div className="imagegen-right">
-            {!generatedImage && !loading && (
-              <div className="ig-empty">
-                <div className="ig-empty-icon">🎨</div>
-                <h3>Your image will appear here</h3>
-                <p>Describe what you want and click Generate</p>
-              </div>
-            )}
-
-            {loading && (
-              <div className="ig-loading">
-                <div className="ig-spinner"></div>
-                <p>AI is creating your image...</p>
-                <small>This may take 20-40 seconds</small>
-              </div>
-            )}
-
-            {generatedImage && (
-              <div className="ig-result">
-                {refPreview && (
-                  <div className="ig-compare">
-                    <div>
-                      <p className="ig-compare-label">📷 Original</p>
-                      <img src={refPreview} alt="Original" className="ig-image" />
-                    </div>
-                    <div>
-                      <p className="ig-compare-label">✨ AI Recreated</p>
-                      <img src={generatedImage} alt="AI Generated" className="ig-image" />
-                    </div>
-                  </div>
-                )}
-                {!refPreview && (
-                  <img src={generatedImage} alt="AI Generated" className="ig-image" />
-                )}
-                <div className="ig-result-actions">
-                  <a href={generatedImage} download="socialgenai-image.png" className="ig-btn primary">
-                    ⬇️ Download
-                  </a>
-                  <button className="ig-btn" onClick={handleSave} disabled={saved}>
-                    {saved ? '✅ Saved' : '💾 Save'}
-                  </button>
-                  <button className="ig-btn" onClick={() => { setGeneratedImage(null); setRefPreview(null); setSaved(false); }}>
-                    🔄 New
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
-    </PageTransition>
+    </div>
   );
 };
 
-export default ImageGenerate;
+export default ImageGen;

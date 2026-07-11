@@ -316,3 +316,83 @@
 
 .ig-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
 .ig-compare-label { color: #4a6a8a; font-size: 0.82rem; text-align: center; margin-bottom: 0.5rem; }
+
+
+.image-gen-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.prompt-form {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.prompt-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+.prompt-form button {
+  background: #10b981;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.prompt-form button:hover {
+  background: #059669;
+}
+
+.image-preview-box {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.generated-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #f0f0f0;
+}
+
+.save-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-btn:hover {
+  background: #2563eb;
+}
+
+.status-message {
+  margin-top: 10px;
+  color: #059669;
+  font-weight: 500;
+}
