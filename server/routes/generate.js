@@ -38,7 +38,7 @@ router.post('/', auth, async (req, res) => {
     }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-flash-latest',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: { responseMimeType: "application/json" }
     });
@@ -85,7 +85,7 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
     };
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-flash-latest',
       contents: [{ role: 'user', parts: [{ text: prompt }, imagePart] }],
       config: { responseMimeType: "application/json" }
     });
