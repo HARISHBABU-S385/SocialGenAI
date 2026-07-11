@@ -16,7 +16,6 @@ const postingTimes = {
   Facebook: { best: '1 PM - 4 PM', peak: '3 PM', traffic: 'Highest on Thu & Fri' }
 };
 
-// 1. Text Content Generation Route
 router.post('/', auth, async (req, res) => {
   try {
     const { topic, platform, tone } = req.body;
@@ -39,7 +38,7 @@ router.post('/', auth, async (req, res) => {
     }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: { responseMimeType: "application/json" }
     });
@@ -71,7 +70,6 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// 2. Image Upload & Content Generation Route
 router.post('/image', auth, upload.single('image'), async (req, res) => {
   try {
     const { platform, tone, topic } = req.body;
@@ -87,7 +85,7 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
     };
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash',
       contents: [{ role: 'user', parts: [{ text: prompt }, imagePart] }],
       config: { responseMimeType: "application/json" }
     });
