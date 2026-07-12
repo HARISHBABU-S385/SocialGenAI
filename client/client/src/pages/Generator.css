@@ -1,6 +1,6 @@
 .generator-page {
   min-height: 100vh;
-  background: #f0ede6;
+  background: #f4ecd8;
   position: relative;
 }
 
@@ -380,3 +380,7 @@
 .ig-form-group textarea, .ig-form-group select { width: 100%; padding: 0.75rem; background: #f8f7f4; border: 1.5px solid #e8e4dc; border-radius: 8px; color: #1a1a1a; font-size: 0.9rem; outline: none; transition: all 0.2s; resize: none; font-family: 'DM Sans', sans-serif; }
 .ig-form-group textarea:focus, .ig-form-group select:focus { border-color: #2d5a3d; background: #ffffff; }
 .ig-form-group select option { background: #ffffff; }
+.ig-form-group textarea,
+.ig-form-group select {
+  color: #1a1a1a !important;
+}
