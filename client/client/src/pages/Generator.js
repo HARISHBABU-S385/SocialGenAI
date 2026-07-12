@@ -1,147 +1,121 @@
 import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { generatePost, generateFromImage } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './Generator.css';
 
 const Generator = () => {
+  const { user, logout } = useAuth();
+  const { platform } = useParams();
+  const navigate = useNavigate();
+  const [mode, setMode] = useState('text');
   const [topic, setTopic] = useState('');
-  const [platform, setPlatform] = useState('Instagram');
-  const [tone, setTone] = useState('Conversational');
+  const [tone, setTone] = useState('casual');
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const platforms = ['Instagram', 'Twitter', 'LinkedIn', 'Facebook', 'TikTok'];
-  const tones = ['Conversational', 'Professional', 'Humorous', 'Inspirational', 'Controversial', 'Educational'];
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) { setImage(file); setImagePreview(URL.createObjectURL(file)); }
+  };
 
   const handleGenerate = async (e) => {
     e.preventDefault();
-    if (!topic.trim()) return;
-
     setLoading(true);
     setError('');
-    setResult(null);
-
     try {
-      // Ensure this endpoint matches your backend route (e.g., /api/posts or /api/generate)
-      const response = await fetch('https://socialgenai-backend.onrender.com/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ topic, platform, tone })
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        setResult(data.data);
+      let res;
+      if (mode === 'image' && image) {
+        const formData = new FormData();
+        formData.append('image', image);
+        formData.append('platform', platform);
+        formData.append('tone', tone);
+        formData.append('topic', topic);
+        res = await generateFromImage(formData);
       } else {
-        setError(data.message || 'Failed to generate content. Please try again.');
+        res = await generatePost({ topic, platform, tone });
       }
+      navigate('/result', { state: { result: res.data.data, postId: res.data.postId, platform } });
     } catch (err) {
-      console.error('Generation Error:', err);
-      setError('A network error occurred. Please check your connection to the server.');
-    } finally {
-      setLoading(false);
+      setError('Generation failed. Please try again.');
     }
+    setLoading(false);
   };
 
   return (
-    <div className="generator-container">
-      <h2>Viral Content Generator</h2>
-      
-      <form onSubmit={handleGenerate} className="generator-form">
-        <div className="form-group">
-          <label>What is your post about?</label>
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="e.g., 5 ways to stay productive while working from home..."
-            rows="3"
-            disabled={loading}
-            required
-          />
+    <div className="generator-page">
+      <nav className="navbar">
+        <span className="navbar-brand">⚡ SocialGenAI</span>
+        <div className="navbar-links">
+          <span className="navbar-user">Hi, {user?.name}</span>
+          <button className="nav-link" onClick={() => navigate('/')}>Platforms</button>
+          <button className="nav-link" onClick={() => navigate('/history')}>History</button>
+          <button className="btn-outline" onClick={logout}>Logout</button>
         </div>
+      </nav>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>Platform</label>
-            <select value={platform} onChange={(e) => setPlatform(e.target.value)} disabled={loading}>
-              {platforms.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+      <div className="generator-wrapper">
+        <div className="generator-card">
+          <div className="platform-badge">{platform}</div>
+          <h1 className="generator-title">Generate Content</h1>
+          <p className="generator-subtitle">Create AI-powered content for {platform}</p>
+
+          <div className="mode-toggle">
+            <button className={`mode-btn ${mode === 'text' ? 'active' : ''}`} onClick={() => setMode('text')}>✏️ Text Topic</button>
+            <button className={`mode-btn ${mode === 'image' ? 'active' : ''}`} onClick={() => setMode('image')}>🖼️ Upload Image</button>
           </div>
 
-          <div className="form-group">
-            <label>Tone</label>
-            <select value={tone} onChange={(e) => setTone(e.target.value)} disabled={loading}>
-              {tones.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
-        </div>
-
-        <button type="submit" className="generate-btn" disabled={loading}>
-          {loading ? 'Analyzing Trends & Generating...' : 'Generate Viral Content'}
-        </button>
-      </form>
-
-      {error && <div className="error-message">{error}</div>}
-
-      {/* Render the structured JSON response */}
-      {result && !loading && (
-        <div className="results-dashboard">
-          
-          <div className="result-card main-caption">
-            <h3>Caption</h3>
-            <p className="whitespace-pre-wrap">{result.caption}</p>
-            
-            <div className="hashtags">
-              {result.hashtags?.map((tag, i) => (
-                <span key={i} className="hashtag">#{tag.replace('#', '')}</span>
-              ))}
-            </div>
-            
-            <div className="cta-box">
-              <strong>Call to Action:</strong> {result.callToAction}
-            </div>
-            
-            {result.postingTime && (
-              <div className="timing-box">
-                <strong>Best Time to Post:</strong> {result.postingTime.best} 
-                (Peak: {result.postingTime.peak}) - <em>{result.postingTime.traffic}</em>
+          <form onSubmit={handleGenerate} className="generator-form">
+            {mode === 'image' ? (
+              <div>
+                <div className="ig-form-group">
+                  <label>Upload Image</label>
+                  <div className="image-upload-area" onClick={() => document.getElementById('imgInput').click()}>
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="preview" className="image-preview" />
+                    ) : (
+                      <div className="upload-placeholder">
+                        <span>🖼️</span>
+                        <p>Click to upload image</p>
+                        <small>JPG, PNG supported</small>
+                      </div>
+                    )}
+                  </div>
+                  <input id="imgInput" type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                </div>
+                <div className="ig-form-group">
+                  <label>Describe your image</label>
+                  <textarea placeholder="Describe the image or add instructions..." value={topic} onChange={(e) => setTopic(e.target.value)} rows={3} />
+                </div>
+              </div>
+            ) : (
+              <div className="ig-form-group">
+                <label>Topic / Keywords</label>
+                <textarea placeholder={`e.g. Launching a new product on ${platform}...`} value={topic} onChange={(e) => setTopic(e.target.value)} rows={4} required />
               </div>
             )}
-          </div>
 
-          <div className="result-card video-script">
-            <h3>Video / Audio Script</h3>
-            <p className="whitespace-pre-wrap">{result.script}</p>
-          </div>
-
-          <div className="result-grid">
-            <div className="result-list hooks">
-              <h3>Viral Hooks</h3>
-              <ul>
-                {result.hooks?.map((hook, i) => <li key={i}>{hook}</li>)}
-              </ul>
+            <div className="ig-form-group">
+              <label>Tone</label>
+              <select value={tone} onChange={(e) => setTone(e.target.value)}>
+                <option value="casual">Casual</option>
+                <option value="professional">Professional</option>
+                <option value="humorous">Humorous</option>
+                <option value="inspirational">Inspirational</option>
+                <option value="promotional">Promotional</option>
+              </select>
             </div>
 
-            <div className="result-list ideas">
-              <h3>Follow-up Post Ideas</h3>
-              <ul>
-                {result.postIdeas?.map((idea, i) => <li key={i}>{idea}</li>)}
-              </ul>
-            </div>
+            <button type="submit" className="generate-btn" disabled={loading}>
+              {loading ? '⏳ Generating...' : '✨ Generate Content'}
+            </button>
+          </form>
 
-            <div className="result-list trends">
-              <h3>Trending Topics in this Niche</h3>
-              <ul>
-                {result.trendingTopics?.map((trend, i) => <li key={i}>{trend}</li>)}
-              </ul>
-            </div>
-          </div>
-          
+          {error && <div className="gen-error">{error}</div>}
         </div>
-      )}
+      </div>
     </div>
   );
 };
