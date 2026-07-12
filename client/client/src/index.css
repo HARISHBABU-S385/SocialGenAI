@@ -16,3 +16,7 @@ input, textarea, select, button { font-family: 'DM Sans', sans-serif; cursor: po
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #f0ede6; }
 ::-webkit-scrollbar-thumb { background: #2d5a3d; border-radius: 10px; }
+.generator-card { max-width: 700px !important; }
+.result-container { max-width: 1100px !important; }
+.platform-container { max-width: 1100px !important; }
+.auth-container { width: 950px !important; height: 540px !important; }
