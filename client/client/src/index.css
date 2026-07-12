@@ -30,6 +30,11 @@ body {
   background: #1a1a2e;
 }
 
+body {
+  background: #f0ede6;
+  color: #1a1a1a;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #6c63ff;
   border-radius: 10px;
