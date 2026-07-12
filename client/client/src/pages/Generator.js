@@ -37,12 +37,14 @@ const Generator = () => {
       } else {
         res = await generatePost({ topic, platform, tone });
       }
-      navigate('/result', { state: { result: res.data.data, postId: res.data.postId, platform } });
+      
+      navigate('/result', { state: { result: res.data.data, postId: res.data.postId, platform, topic } });
     } catch (err) {
       setError('Generation failed. Please try again.');
     }
     setLoading(false);
   };
+  
 
   return (
     <div className="generator-page">

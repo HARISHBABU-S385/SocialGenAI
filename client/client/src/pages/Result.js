@@ -70,6 +70,9 @@ const Result = () => {
           )}
           <h1>Your Generated Content</h1>
           <p>Platform: <span>{platform}</span></p>
+          {location.state?.topic && (
+  <p className="result-topic">Topic: <span>{location.state.topic}</span></p>
+)}
         </div>
 
         <div className="result-tabs">

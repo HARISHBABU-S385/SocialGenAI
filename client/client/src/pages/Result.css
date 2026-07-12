@@ -53,3 +53,6 @@
 .result-action-btn:hover { background: rgba(77,166,255,0.1); transform: translateY(-2px); }
 .result-action-btn.primary { background: linear-gradient(135deg, #1565c0, #1976d2); color: #e3f2fd; border-color: rgba(77,166,255,0.3); }
 .result-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.result-topic { color: #888; font-size: 0.9rem; margin-top: 0.3rem; }
+.result-topic span { color: #2d5a3d; font-weight: 500; }
