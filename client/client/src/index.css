@@ -19,4 +19,4 @@ input, textarea, select, button { font-family: 'DM Sans', sans-serif; cursor: po
 .generator-card { max-width: 1100px !important; }
 .result-container { max-width: 1500px !important; }
 .platform-container { max-width: 1500px !important; }
-.auth-container { width: 1450px !important; height: 940px !important; }
+.auth-container { width: 1100px !important; height: 600px !important; }
