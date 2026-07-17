@@ -291,7 +291,7 @@
   left: var(--x);
   bottom: -50px;
   font-size: var(--size);
-  opacity: 0.12;
+  opacity: 0.25;
   animation: floatUp 14s var(--delay) ease-in-out infinite;
 }
 

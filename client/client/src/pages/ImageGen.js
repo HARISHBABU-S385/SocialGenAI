@@ -22,7 +22,7 @@ const ImageGenerate = () => {
     setSaved(false);
     try {
       let finalPrompt = refPreview ? `recreate this style: ${prompt}, same mood` : prompt;
-      finalPrompt += `, ${style} style, ultra realistic, 8k resolution, professional photography, cinematic lighting, highly detailed, award winning, masterpiece, sharp focus, no watermark, no text, no watermark`;
+      finalPrompt += `, ${style} style, ultra realistic, 8k, professional photography, sharp focus, no distortion, correct proportions, no watermark, no text`;
       const encodedPrompt = encodeURIComponent(finalPrompt);
       setGeneratedImage(`https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`);
     } catch (err) {
