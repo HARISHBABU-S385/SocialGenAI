@@ -11,23 +11,29 @@ router.post('/', auth, async (req, res) => {
     const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/stabilityai/stable-diffusion-xl-base-1.0`;
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: prompt + ", high quality, professional, no text, no watermark" })
+      headers: { 
+        "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ 
+        prompt: prompt + ", high quality, professional, no text, no watermark" 
+      })
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.errors?.[0]?.message || 'Cloudflare API failed');
+      console.error('Cloudflare Error:', errorData);
+      throw new Error('Cloudflare API failed');
     }
     
-    // Cloudflare returns JSON with the image as a base64 string
-    const data = await response.json();
-    const base64Image = `data:image/png;base64,${data.image}`;
+    // Use arrayBuffer() for Node.js native fetch
+    const arrayBuffer = await response.arrayBuffer();
+    const base64Image = Buffer.from(arrayBuffer).toString('base64');
     
-    res.json({ image: base64Image });
+    res.json({ image: `data:image/png;base64,${base64Image}` });
   } catch (err) {
     console.error('Image Generation Error:', err.message);
-    res.status(500).json({ message: 'Generation failed: ' + err.message });
+    res.status(500).json({ message: 'Generation failed' });
   }
 });
 
