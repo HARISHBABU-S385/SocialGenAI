@@ -8,7 +8,6 @@ import History from './pages/History';
 import Result from './pages/Result';
 import './App.css';
 import ImageGen from './pages/ImageGen';
-import InstagramDemo from './pages/InstagramDemo';
 
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useAuth();
@@ -28,7 +27,6 @@ function App() {
           <Route path="/imagegenerate" element={<PrivateRoute><ImageGen /></PrivateRoute>} />
           
 <Route path="/result" element={<PrivateRoute><Result /></PrivateRoute>} />
-          <Route path="/instagram-demo" element={<PrivateRoute><InstagramDemo /></PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
