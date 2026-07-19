@@ -29,7 +29,15 @@ async function queryCloudflare(prompt) {
     headers: { "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, "Content-Type": "application/json" },
     body: JSON.stringify({ messages: [{ role: "user", content: prompt }] })
   });
+  
   const result = await response.json();
+  
+  // Safely check if Cloudflare returned an error
+  if (!result.success) {
+    console.error('Cloudflare API Error:', JSON.stringify(result.errors));
+    throw new Error('Cloudflare API failed');
+  }
+  
   return result.result.response;
 }
 
@@ -70,7 +78,7 @@ Respond ONLY in this exact JSON format with no extra text:
     await post.save();
     res.json({ success: true, data: { ...generated, postingTime: timing }, postId: post._id });
   } catch (err) {
-    console.error('ERROR:', err.message);
+    console.error('TEXT GENERATION ERROR:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
