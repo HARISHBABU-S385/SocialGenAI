@@ -8,10 +8,19 @@ router.post('/', auth, async (req, res) => {
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ message: 'Prompt required' });
     
-    const encodedPrompt = encodeURIComponent(prompt + ', high quality, professional, no text, no watermark');
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+    const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/stabilityai/stable-diffusion-xl-base-1.0`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: prompt + ", high quality, professional, no text, no watermark" })
+    });
+
+    if (!response.ok) throw new Error('Cloudflare Image API failed');
     
-    res.json({ image: imageUrl });
+    const imageBuffer = await response.buffer();
+    const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+    
+    res.json({ image: base64Image });
   } catch (err) {
     res.status(500).json({ message: 'Generation failed' });
   }

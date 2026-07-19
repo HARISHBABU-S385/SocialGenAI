@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { CohereClient } = require('cohere-ai');
 const Post = require('../models/Post');
 const multer = require('multer');
 const fs = require('fs');
 
-const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
 const upload = multer({ dest: 'uploads/' });
 
 const postingTimes = {
@@ -16,10 +14,28 @@ const postingTimes = {
   Facebook: { best: '1 PM - 4 PM', peak: '3 PM', traffic: 'Highest on Thu & Fri' }
 };
 
+function extractJSON(text) {
+  let cleaned = text.replace(/```json|```/g, '').trim();
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1) cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+  return JSON.parse(cleaned);
+}
+
+async function queryCloudflare(prompt) {
+  const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/meta/llama-3-8b-instruct`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: [{ role: "user", content: prompt }] })
+  });
+  const result = await response.json();
+  return result.result.response;
+}
+
 router.post('/', auth, async (req, res) => {
   try {
     const { topic, platform, tone } = req.body;
-
     const prompt = `You are a viral social media content creator. Create highly engaging content for:
 - Topic: ${topic}
 - Platform: ${platform}
@@ -38,35 +54,23 @@ Respond ONLY in this exact JSON format with no extra text:
   "viralSuggestions": ["strategy1", "strategy2", "strategy3", "strategy4"]
 }`;
 
-    const response = await cohere.chat({
-      model: 'command-a-03-2025',
-      message: prompt,
-      temperature: 0.7
-    });
-
-    const text = response.text;
-    const cleaned = text.replace(/```json|```/g, '').trim();
-    const generated = JSON.parse(cleaned);
+    const text = await queryCloudflare(prompt);
+    const generated = extractJSON(text);
     const timing = postingTimes[platform] || postingTimes['Instagram'];
 
     const post = new Post({
-      userId: req.user.id,
-      topic, platform, tone,
-      caption: generated.caption,
-      hashtags: generated.hashtags,
-      callToAction: generated.callToAction,
-      postIdeas: generated.postIdeas,
-      script: generated.script || '',
-      hooks: generated.hooks || [],
-      trendingTopics: generated.trendingTopics || [],
-      viralSuggestions: generated.viralSuggestions || [],
+      userId: req.user.id, topic, platform, tone,
+      caption: generated.caption, hashtags: generated.hashtags,
+      callToAction: generated.callToAction, postIdeas: generated.postIdeas,
+      script: generated.script || '', hooks: generated.hooks || [],
+      trendingTopics: generated.trendingTopics || [], viralSuggestions: generated.viralSuggestions || [],
       nicheOfDay: generated.nicheOfDay || ''
     });
 
     await post.save();
     res.json({ success: true, data: { ...generated, postingTime: timing }, postId: post._id });
   } catch (err) {
-    console.error('FULL ERROR:', err);
+    console.error('ERROR:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
@@ -75,43 +79,27 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
   try {
     const { platform, tone, topic } = req.body;
     const imageFile = req.file;
-
     if (!imageFile) return res.status(400).json({ message: 'No image uploaded' });
 
     const prompt = `Create ${platform} social media content in ${tone} tone for this topic: ${topic || 'general lifestyle content'}.
 Respond ONLY in valid JSON with these keys: imageDescription, caption, hashtags, callToAction, postIdeas, script, hooks, nicheOfDay, trendingTopics, viralSuggestions.`;
 
-    const response = await cohere.chat({
-      model: 'command-a-03-2025',
-      message: prompt,
-      temperature: 0.7
-    });
-
-    const text = response.text;
-    const cleaned = text.replace(/```json|```/g, '').trim();
-    const generated = JSON.parse(cleaned);
-
+    const text = await queryCloudflare(prompt);
+    const generated = extractJSON(text);
     if (fs.existsSync(imageFile.path)) fs.unlinkSync(imageFile.path);
 
     const post = new Post({
-      userId: req.user.id,
-      topic: generated.imageDescription || topic,
-      platform, tone,
-      caption: generated.caption,
-      hashtags: generated.hashtags,
-      callToAction: generated.callToAction,
-      postIdeas: generated.postIdeas,
-      script: generated.script || '',
-      hooks: generated.hooks || [],
-      trendingTopics: generated.trendingTopics || [],
-      viralSuggestions: generated.viralSuggestions || [],
+      userId: req.user.id, topic: generated.imageDescription || topic,
+      platform, tone, caption: generated.caption, hashtags: generated.hashtags,
+      callToAction: generated.callToAction, postIdeas: generated.postIdeas,
+      script: generated.script || '', hooks: generated.hooks || [],
+      trendingTopics: generated.trendingTopics || [], viralSuggestions: generated.viralSuggestions || [],
       nicheOfDay: generated.nicheOfDay || ''
     });
 
     await post.save();
     res.json({ success: true, data: { ...generated, postingTime: postingTimes[platform] }, postId: post._id });
   } catch (err) {
-    console.error('FULL ERROR:', err);
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     res.status(500).json({ message: err.message });
   }
