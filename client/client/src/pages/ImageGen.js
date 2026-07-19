@@ -14,17 +14,28 @@ const ImageGenerate = () => {
   const [refPreview, setRefPreview] = useState(null);
   const [saved, setSaved] = useState(false);
 
-  const handleGenerate = async (e) => {
+    const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setGeneratedImage(null);
     setSaved(false);
     try {
-      let finalPrompt = refPreview ? `recreate this style: ${prompt}, same mood` : prompt;
-      finalPrompt += `, ${style} style, ultra realistic, 8k, professional photography, sharp focus, no distortion, correct proportions, no watermark, no text`;
-      const encodedPrompt = encodeURIComponent(finalPrompt);
-      setGeneratedImage(`https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`);
+      const token = localStorage.getItem('token');
+      const res = await fetch('https://socialgenai-backend.onrender.com/api/imagegenerate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      if (data.image) {
+        setGeneratedImage(data.image);
+      } else {
+        setError(data.message || 'Generation failed');
+      }
     } catch (err) {
       setError('Generation failed. Try again.');
     }

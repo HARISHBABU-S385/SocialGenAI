@@ -33,11 +33,25 @@ const Result = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleGenerateImage = () => {
+    const handleGenerateImage = async () => {
     setImageLoading(true);
-    const encodedPrompt = encodeURIComponent(`${result.caption}, ${platform}, professional photography, no text, no watermark`);
-    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
-    setAiImage(url);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('https://socialgenai-backend.onrender.com/api/imagegenerate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ prompt: `${result.caption}, ${platform}` })
+      });
+      const data = await res.json();
+      if (data.image) {
+        setAiImage(data.image);
+      }
+    } catch (err) {
+      console.error('Image generation failed');
+    }
     setImageLoading(false);
   };
 
