@@ -15,14 +15,19 @@ router.post('/', auth, async (req, res) => {
       body: JSON.stringify({ prompt: prompt + ", high quality, professional, no text, no watermark" })
     });
 
-    if (!response.ok) throw new Error('Cloudflare Image API failed');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.errors?.[0]?.message || 'Cloudflare API failed');
+    }
     
-    const imageBuffer = await response.buffer();
-    const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+    // Cloudflare returns JSON with the image as a base64 string
+    const data = await response.json();
+    const base64Image = `data:image/png;base64,${data.image}`;
     
     res.json({ image: base64Image });
   } catch (err) {
-    res.status(500).json({ message: 'Generation failed' });
+    console.error('Image Generation Error:', err.message);
+    res.status(500).json({ message: 'Generation failed: ' + err.message });
   }
 });
 
