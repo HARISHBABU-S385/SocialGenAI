@@ -15,11 +15,32 @@ const postingTimes = {
 };
 
 function extractJSON(text) {
+  // 1. Remove markdown formatting
   let cleaned = text.replace(/```json|```/g, '').trim();
+  
+  // 2. Isolate the JSON object
   const firstBrace = cleaned.indexOf('{');
   const lastBrace = cleaned.lastIndexOf('}');
-  if (firstBrace !== -1 && lastBrace !== -1) cleaned = cleaned.substring(firstBrace, lastBrace + 1);
-  return JSON.parse(cleaned);
+  if (firstBrace !== -1 && lastBrace !== -1) {
+    cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+  }
+  
+  try {
+    // 3. Sanitize bad control characters (raw newlines, carriage returns, tabs)
+    // Replacing them with spaces prevents words from mashing together while keeping JSON valid
+    cleaned = cleaned.replace(/[\n\r\t]+/g, ' ');
+    
+    // Optional: Fix unescaped double quotes inside strings by escaping them, 
+    // but ignoring structural quotes (a bit complex for regex, so sanitizing newlines usually fixes 99% of LLaMA errors)
+    
+    return JSON.parse(cleaned);
+  } catch (err) {
+    // 4. If it fails, log the EXACT raw text to Render so you know exactly what the AI did
+    console.error("================ FAILED AI RAW OUTPUT ================");
+    console.error(text);
+    console.error("=======================================================");
+    throw new Error('Failed to parse AI response into valid JSON.');
+  }
 }
 
 async function queryCloudflare(prompt) {
