@@ -23,8 +23,7 @@ function extractJSON(text) {
 }
 
 async function queryCloudflare(prompt) {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/meta/llama-3-8b-instruct`;
-  const response = await fetch(url, {
+const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/meta/llama-3.1-8b-instruct`;  const response = await fetch(url, {
     method: "POST",
     headers: { "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, "Content-Type": "application/json" },
     body: JSON.stringify({ messages: [{ role: "user", content: prompt }] })
