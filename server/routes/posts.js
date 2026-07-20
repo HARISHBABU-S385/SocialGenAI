@@ -14,12 +14,13 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Save a post
+// Save a post
 router.put('/save/:id', auth, async (req, res) => {
   try {
     const post = await Post.findByIdAndUpdate(
       req.params.id,
       { isSaved: true },
-      { new: true }
+      { returnDocument: 'after' } // <--- Fixed!
     );
     res.json(post);
   } catch (err) {

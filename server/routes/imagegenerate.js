@@ -16,7 +16,7 @@ router.post('/', auth, async (req, res) => {
         "Content-Type": "application/json" 
       },
       body: JSON.stringify({ 
-        prompt: prompt + ", high quality, professional, no text, no watermark" 
+        prompt: prompt + ", ultra-realistic, 8k resolution, cinematic lighting, photorealistic, highly detailed, no text, no watermark" 
       })
     });
 
@@ -26,11 +26,30 @@ router.post('/', auth, async (req, res) => {
       throw new Error('Cloudflare API failed');
     }
     
-    // Use arrayBuffer() for Node.js native fetch
+    // Convert arrayBuffer to base64
     const arrayBuffer = await response.arrayBuffer();
-    const base64Image = Buffer.from(arrayBuffer).toString('base64');
+    const base64String = Buffer.from(arrayBuffer).toString('base64');
+    const formattedImageUrl = `data:image/png;base64,${base64String}`;
     
-    res.json({ image: `data:image/png;base64,${base64Image}` });
+    // Save the generated image directly to MongoDB History
+    const post = new Post({
+      userId: req.user.id,
+      topic: prompt,
+      platform: 'AI Image',
+      tone: 'visual',
+      caption: prompt,
+      hashtags: [],
+      callToAction: '',
+      postIdeas: [],
+      isSaved: true,
+      imageUrl: formattedImageUrl // Save the base64 image here
+    });
+    
+    await post.save();
+    
+    // Return both the image and the new database ID to the frontend
+    res.json({ image: formattedImageUrl, postId: post._id });
+    
   } catch (err) {
     console.error('Image Generation Error:', err.message);
     res.status(500).json({ message: 'Generation failed' });
