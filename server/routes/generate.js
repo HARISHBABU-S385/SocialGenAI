@@ -15,32 +15,28 @@ const postingTimes = {
 };
 
 function extractJSON(text) {
-  // 1. Remove markdown formatting
   let cleaned = text.replace(/```json|```/g, '').trim();
-  
-  // 2. Isolate the JSON object
   const firstBrace = cleaned.indexOf('{');
   const lastBrace = cleaned.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace !== -1) {
     cleaned = cleaned.substring(firstBrace, lastBrace + 1);
   }
-  
   try {
-    // 3. Sanitize bad control characters (raw newlines, carriage returns, tabs)
-    // Replacing them with spaces prevents words from mashing together while keeping JSON valid
     cleaned = cleaned.replace(/[\n\r\t]+/g, ' ');
-    
-    // Optional: Fix unescaped double quotes inside strings by escaping them, 
-    // but ignoring structural quotes (a bit complex for regex, so sanitizing newlines usually fixes 99% of LLaMA errors)
-    
     return JSON.parse(cleaned);
   } catch (err) {
-    // 4. If it fails, log the EXACT raw text to Render so you know exactly what the AI did
-    console.error("================ FAILED AI RAW OUTPUT ================");
-    console.error(text);
-    console.error("=======================================================");
+    console.error("FAILED AI RAW OUTPUT:", text);
     throw new Error('Failed to parse AI response into valid JSON.');
   }
+}
+
+function ensureArrays(generated) {
+  if (typeof generated.hashtags === 'string') generated.hashtags = generated.hashtags.split(',').map(h => h.trim());
+  if (typeof generated.hooks === 'string') generated.hooks = [generated.hooks];
+  if (typeof generated.postIdeas === 'string') generated.postIdeas = [generated.postIdeas];
+  if (typeof generated.trendingTopics === 'string') generated.trendingTopics = [generated.trendingTopics];
+  if (typeof generated.viralSuggestions === 'string') generated.viralSuggestions = [generated.viralSuggestions];
+  return generated;
 }
 
 async function queryCloudflare(prompt) {
@@ -48,19 +44,13 @@ async function queryCloudflare(prompt) {
   const response = await fetch(url, {
     method: "POST",
     headers: { "Authorization": `Bearer ${process.env.CF_API_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 4096  // <-- ADDED THIS TO PREVENT CUTTING OFF
-    })
+    body: JSON.stringify({ messages: [{ role: "user", content: prompt }], max_tokens: 4096 })
   });
-  
   const result = await response.json();
-  
   if (!result.success) {
     console.error('Cloudflare API Error:', JSON.stringify(result.errors));
     throw new Error('Cloudflare API failed');
   }
-  
   return result.result.response;
 }
 
@@ -86,13 +76,9 @@ Respond ONLY in this exact JSON format with no extra text:
 }`;
 
     const text = await queryCloudflare(prompt);
-   // Ensure arrays
-if (typeof generated.hashtags === 'string') generated.hashtags = generated.hashtags.split(',').map(h => h.trim());
-if (typeof generated.hooks === 'string') generated.hooks = [generated.hooks];
-if (typeof generated.postIdeas === 'string') generated.postIdeas = [generated.postIdeas];
-if (typeof generated.trendingTopics === 'string') generated.trendingTopics = [generated.trendingTopics];
-if (typeof generated.viralSuggestions === 'string') generated.viralSuggestions = [generated.viralSuggestions];
+    const generated = ensureArrays(extractJSON(text));
     const timing = postingTimes[platform] || postingTimes['Instagram'];
+
     const post = new Post({
       userId: req.user.id, topic, platform, tone,
       caption: generated.caption, hashtags: generated.hashtags,
@@ -120,7 +106,7 @@ router.post('/image', auth, upload.single('image'), async (req, res) => {
 Respond ONLY in valid JSON with these keys: imageDescription, caption, hashtags, callToAction, postIdeas, script, hooks, nicheOfDay, trendingTopics, viralSuggestions.`;
 
     const text = await queryCloudflare(prompt);
-    const generated = extractJSON(text);
+    const generated = ensureArrays(extractJSON(text));
     if (fs.existsSync(imageFile.path)) fs.unlinkSync(imageFile.path);
 
     const post = new Post({
