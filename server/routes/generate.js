@@ -91,8 +91,8 @@ if (typeof generated.hashtags === 'string') generated.hashtags = generated.hasht
 if (typeof generated.hooks === 'string') generated.hooks = [generated.hooks];
 if (typeof generated.postIdeas === 'string') generated.postIdeas = [generated.postIdeas];
 if (typeof generated.trendingTopics === 'string') generated.trendingTopics = [generated.trendingTopics];
-if (typeof generated.viralSuggestions === 'string') generated.viralSuggestions = [generated.viralSuggestions];|| postingTimes['Instagram'];
-
+if (typeof generated.viralSuggestions === 'string') generated.viralSuggestions = [generated.viralSuggestions];
+    const timing = postingTimes[platform] || postingTimes['Instagram'];
     const post = new Post({
       userId: req.user.id, topic, platform, tone,
       caption: generated.caption, hashtags: generated.hashtags,
