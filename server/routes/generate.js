@@ -86,8 +86,12 @@ Respond ONLY in this exact JSON format with no extra text:
 }`;
 
     const text = await queryCloudflare(prompt);
-    const generated = extractJSON(text);
-    const timing = postingTimes[platform] || postingTimes['Instagram'];
+   // Ensure arrays
+if (typeof generated.hashtags === 'string') generated.hashtags = generated.hashtags.split(',').map(h => h.trim());
+if (typeof generated.hooks === 'string') generated.hooks = [generated.hooks];
+if (typeof generated.postIdeas === 'string') generated.postIdeas = [generated.postIdeas];
+if (typeof generated.trendingTopics === 'string') generated.trendingTopics = [generated.trendingTopics];
+if (typeof generated.viralSuggestions === 'string') generated.viralSuggestions = [generated.viralSuggestions];|| postingTimes['Instagram'];
 
     const post = new Post({
       userId: req.user.id, topic, platform, tone,
