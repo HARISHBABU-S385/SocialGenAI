@@ -24,4 +24,4 @@ const PostSchema = new mongoose.Schema({
   aiImage: { type: String, default: '' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.models.Post || mongoose.model('Post', PostSchema);
