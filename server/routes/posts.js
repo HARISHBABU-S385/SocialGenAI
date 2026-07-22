@@ -1,50 +1,27 @@
-const express = require('express');
-const router = express.Router();
-const auth = require('../middleware/auth');
-const Post = require('../models/Post');
+const mongoose = require('mongoose');
 
-// Get all posts for logged in user
-router.get('/', auth, async (req, res) => {
-  try {
-    const posts = await Post.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    res.json(posts);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+const PostSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  topic: { type: String, required: true },
+  platform: { type: String, required: true },
+  tone: { type: String, required: true },
+  caption: { type: String, required: true },
+  hashtags: { type: [String], default: [] },
+  callToAction: { type: String, default: '' },
+  postIdeas: { type: [String], default: [] },
+  script: { type: String, default: '' },
+  hooks: { type: [String], default: [] },
+  nicheOfDay: { type: String, default: '' },
+  trendingTopics: { type: [String], default: [] },
+  viralSuggestions: { type: [String], default: [] },
+  postingTime: {
+    best: { type: String, default: '' },
+    peak: { type: String, default: '' },
+    traffic: { type: String, default: '' }
+  },
+  isSaved: { type: Boolean, default: false },
+  imageUrl: { type: String, default: '' },
+  aiImage: { type: String, default: '' }
+}, { timestamps: true });
 
-// Save a post
-// Save a post
-router.put('/save/:id', auth, async (req, res) => {
-  try {
-    const post = await Post.findByIdAndUpdate(
-      req.params.id,
-      { isSaved: true, ...req.body },
-      { new: true }
-    );
-    res.json(post);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-// Delete a post
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    await Post.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Post deleted' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Get saved posts only
-router.get('/saved', auth, async (req, res) => {
-  try {
-    const posts = await Post.find({ userId: req.user.id, isSaved: true }).sort({ createdAt: -1 });
-    res.json(posts);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-module.exports = router;
+module.exports = mongoose.model('Post', PostSchema);

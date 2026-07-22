@@ -75,7 +75,7 @@ const History = () => {
               >
                 <div className="history-item-header">
                   <span className="platform-badge">{post.platform}</span>
-                  {post.isSaved && <span className="saved-badge">💾</span>}
+                  {post.aiImage && <img src={post.aiImage} alt="AI Generated" style={{width:'100%', borderRadius:'12px'}} />}
                   <button className="delete-btn" onClick={(e) => { e.stopPropagation(); handleDelete(post._id); }}>🗑️</button>
                 </div>
                 <p className="history-item-topic">{post.topic}</p>

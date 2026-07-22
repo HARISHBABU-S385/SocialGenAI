@@ -21,11 +21,11 @@ const Result = () => {
   }
 
   const handleSave = async () => {
-    try {
-      await savePost(postId);
-      setSaved(true);
-    } catch (err) {}
-  };
+  try {
+  await savePost(postId, { ...result, imageUrl: aiImage });
+    setSaved(true);
+  } catch (err) {}
+};
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`${result.caption}\n\n${result.hashtags?.map(h => `#${h}`).join(' ')}\n\n${result.callToAction}`);
