@@ -15,6 +15,7 @@ const postingTimes = {
 };
 
 function extractJSON(text) {
+  if (typeof text !== 'string') text = JSON.stringify(text);
   let cleaned = text.replace(/```json|```/g, '').trim();
   const firstBrace = cleaned.indexOf('{');
   const lastBrace = cleaned.lastIndexOf('}');
@@ -22,11 +23,15 @@ function extractJSON(text) {
     cleaned = cleaned.substring(firstBrace, lastBrace + 1);
   }
   try {
-    cleaned = cleaned.replace(/[\n\r\t]+/g, ' ');
     return JSON.parse(cleaned);
   } catch (err) {
-    console.error("FAILED AI RAW OUTPUT:", text);
-    throw new Error('Failed to parse AI response into valid JSON.');
+    try {
+      cleaned = cleaned.replace(/[\n\r\t]/g, ' ').replace(/\s+/g, ' ');
+      return JSON.parse(cleaned);
+    } catch (err2) {
+      console.error("FAILED AI RAW OUTPUT:", text);
+      throw new Error('Failed to parse AI response into valid JSON.');
+    }
   }
 }
 
