@@ -16,21 +16,33 @@ const postingTimes = {
 
 function extractJSON(text) {
   if (typeof text !== 'string') text = JSON.stringify(text);
-  let cleaned = text.replace(/```json|```/g, '').trim();
-  const firstBrace = cleaned.indexOf('{');
-  const lastBrace = cleaned.lastIndexOf('}');
-  if (firstBrace !== -1 && lastBrace !== -1) {
-    cleaned = cleaned.substring(firstBrace, lastBrace + 1);
-  }
   try {
-    return JSON.parse(cleaned);
-  } catch (err) {
+    // First try direct parse
+    return JSON.parse(text);
+  } catch (e1) {
     try {
-      cleaned = cleaned.replace(/[\n\r\t]/g, ' ').replace(/\s+/g, ' ');
+      // Remove markdown
+      let cleaned = text.replace(/```json|```/g, '').trim();
+      // Extract JSON object
+      const first = cleaned.indexOf('{');
+      const last = cleaned.lastIndexOf('}');
+      if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+      // Replace newlines inside strings
+      cleaned = cleaned.replace(/\n/g, '\\n').replace(/\r/g, '').replace(/\t/g, '\\t');
       return JSON.parse(cleaned);
-    } catch (err2) {
-      console.error("FAILED AI RAW OUTPUT:", text);
-      throw new Error('Failed to parse AI response into valid JSON.');
+    } catch (e2) {
+      try {
+        // Aggressive clean - strip all control chars
+        let cleaned = text.replace(/```json|```/g, '').trim();
+        const first = cleaned.indexOf('{');
+        const last = cleaned.lastIndexOf('}');
+        if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+        cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, ' ');
+        return JSON.parse(cleaned);
+      } catch (e3) {
+        console.error("FAILED AI RAW OUTPUT:", text);
+        throw new Error('Failed to parse AI response into valid JSON.');
+      }
     }
   }
 }
