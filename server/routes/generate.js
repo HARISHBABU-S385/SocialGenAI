@@ -14,51 +14,38 @@ const postingTimes = {
   Facebook: { best: '1 PM - 4 PM', peak: '3 PM', traffic: 'Highest on Thu & Fri' }
 };
 
-function extractJSON(raw) {
-  let start = raw.indexOf('{');
-  let end = raw.lastIndexOf('}');
-  if (start === -1 || end === -1) throw new Error('No JSON found');
-  let jsonStr = raw.slice(start, end + 1);
-
-  // Escape raw newlines/tabs/CR that occur INSIDE string values only
-  let result = '';
-  let inString = false;
-  let escapeNext = false;
-
-  for (let i = 0; i < jsonStr.length; i++) {
-    const ch = jsonStr[i];
-
-    if (escapeNext) {
-      result += ch;
-      escapeNext = false;
-      continue;
+function extractJSON(text) {
+  if (typeof text !== 'string') text = JSON.stringify(text);
+  try {
+    // First try direct parse
+    return JSON.parse(text);
+  } catch (e1) {
+    try {
+      // Remove markdown
+      let cleaned = text.replace(/```json|```/g, '').trim();
+      // Extract JSON object
+      const first = cleaned.indexOf('{');
+      const last = cleaned.lastIndexOf('}');
+      if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+      // Replace newlines inside strings
+      cleaned = cleaned.replace(/\n/g, '\\n').replace(/\r/g, '').replace(/\t/g, '\\t');
+      return JSON.parse(cleaned);
+    } catch (e2) {
+      try {
+        // Aggressive clean - strip all control chars
+        let cleaned = text.replace(/```json|```/g, '').trim();
+        const first = cleaned.indexOf('{');
+        const last = cleaned.lastIndexOf('}');
+        if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+        cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, ' ');
+        return JSON.parse(cleaned);
+      } catch (e3) {
+        console.error("FAILED AI RAW OUTPUT:", text);
+        throw new Error('Failed to parse AI response into valid JSON.');
+      }
     }
-
-    if (ch === '\\') {
-      result += ch;
-      escapeNext = true;
-      continue;
-    }
-
-    if (ch === '"') {
-      inString = !inString;
-      result += ch;
-      continue;
-    }
-
-    if (inString) {
-      if (ch === '\n') { result += '\\n'; continue; }
-      if (ch === '\r') { result += '\\r'; continue; }
-      if (ch === '\t') { result += '\\t'; continue; }
-    }
-
-    result += ch;
   }
-
-  return JSON.parse(result);
 }
-
-module.exports = extractJSON;
 
 function ensureArrays(generated) {
   if (typeof generated.hashtags === 'string') generated.hashtags = generated.hashtags.split(',').map(h => h.trim());
