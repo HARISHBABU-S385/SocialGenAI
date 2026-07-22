@@ -19,15 +19,14 @@ router.put('/save/:id', auth, async (req, res) => {
   try {
     const post = await Post.findByIdAndUpdate(
       req.params.id,
-      { isSaved: true },
-      { returnDocument: 'after' } // <--- Fixed!
+      { isSaved: true, ...req.body },
+      { new: true }
     );
     res.json(post);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 // Delete a post
 router.delete('/:id', auth, async (req, res) => {
   try {
