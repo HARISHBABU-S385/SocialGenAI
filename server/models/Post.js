@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -14,8 +14,14 @@ const PostSchema = new mongoose.Schema({
   nicheOfDay: { type: String, default: '' },
   trendingTopics: { type: [String], default: [] },
   viralSuggestions: { type: [String], default: [] },
+  postingTime: {
+    best: { type: String, default: '' },
+    peak: { type: String, default: '' },
+    traffic: { type: String, default: '' }
+  },
   isSaved: { type: Boolean, default: false },
-  imageUrl: { type: String, default: '' }
+  imageUrl: { type: String, default: '' },
+  aiImage: { type: String, default: '' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.models.Post || mongoose.model('Post', PostSchema);
